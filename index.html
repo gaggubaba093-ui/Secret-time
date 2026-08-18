@@ -1,0 +1,2043 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>Secret Frame</title>
+
+<style>
+*{box-sizing:border-box}
+html,body{
+  margin:0;width:100%;height:100%;overflow:hidden;
+  font-family:Arial,sans-serif;background:#06121b;color:#fff
+}
+button,input{font:inherit}
+button{cursor:pointer}
+
+#login{
+  height:100dvh;display:flex;align-items:center;
+  justify-content:center;padding:20px;background:#020b12
+}
+.loginBox{
+  width:min(400px,100%);padding:28px 22px;
+  border:1px solid #08c8ff;border-radius:25px;
+  background:#071824;box-shadow:0 0 35px #008cff44
+}
+.logo{
+  width:100px;height:100px;margin:auto;border:4px solid #08c8ff;
+  border-radius:50%;display:grid;place-items:center;
+  font-size:40px;font-weight:900;font-style:italic;
+  box-shadow:0 0 25px #00bfff
+}
+h1{text-align:center;margin:16px 0 5px}
+.sub{text-align:center;color:#91aabd;margin-bottom:22px}
+.loginBox input{
+  width:100%;height:52px;margin-bottom:12px;padding:0 15px;
+  border-radius:13px;border:1px solid #174c6c;
+  background:#06131d;color:#fff;outline:0
+}
+.loginBtn{
+  width:100%;height:52px;border:0;border-radius:13px;
+  background:linear-gradient(135deg,#08cfff,#00d19d);
+  color:#fff;font-weight:bold
+}
+.error{text-align:center;color:#ff6878;min-height:25px;margin-top:10px}
+.hint{text-align:center;color:#91aabd;font-size:12px}
+
+#app{display:none;width:100%;height:100dvh}
+.chats{height:100%;display:flex;flex-direction:column;background:#071923}
+
+.top{
+  height:78px;display:flex;align-items:center;padding:10px 13px;
+  border-bottom:1px solid #104965
+}
+.topLogo{
+  width:50px;height:50px;border:3px solid #08c8ff;
+  border-radius:50%;display:grid;place-items:center;font-weight:900
+}
+.topTitle{flex:1;padding-left:12px}
+.topTitle b{display:block;font-size:20px}
+.topTitle span{color:#91aabd;font-size:12px}
+
+.menu,.callBtn,.action{
+  border:1px solid #12618e;border-radius:11px;
+  background:#0b2637;color:#fff
+}
+.menu{width:44px;height:44px;font-size:20px}
+
+.search{padding:9px;border-bottom:1px solid #10394e}
+.search input{
+  width:100%;height:45px;border:1px solid #174c6c;
+  border-radius:23px;background:#06131d;color:#fff;
+  padding:0 16px;outline:0
+}
+
+.stories{
+  display:flex;gap:12px;padding:10px;overflow-x:auto;
+  border-bottom:1px solid #104965
+}
+.story{min-width:70px;text-align:center;font-size:11px}
+.storyAvatar{
+  width:62px;height:62px;border-radius:50%;
+  border:3px solid #08c8ff;padding:2px;
+  background:#06121b;object-fit:cover;display:block;margin:auto
+}
+.storyAdd{
+  width:62px;height:62px;border-radius:50%;
+  border:2px dashed #08c8ff;display:grid;place-items:center;
+  font-size:28px;margin:auto;background:#0b2637
+}
+
+.list{flex:1;overflow:auto}
+.person{
+  height:80px;display:flex;align-items:center;gap:12px;
+  padding:10px 13px;border-bottom:1px solid #0d3347
+}
+.avatar{
+  width:57px;height:57px;flex:none;border:2px solid #08c8ff;
+  border-radius:50%;display:grid;place-items:center;
+  background:#0b2232;font-weight:bold;overflow:hidden
+}
+.avatar img{width:100%;height:100%;object-fit:cover}
+.info{flex:1;min-width:0}
+.name{font-weight:bold}
+.status{
+  font-size:12px;color:#91aabd;margin-top:6px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis
+}
+.dot{
+  display:inline-block;width:8px;height:8px;border-radius:50%;
+  background:#00e85a;margin-left:5px
+}
+
+.chat{
+  position:fixed;inset:0;background:#06121b;
+  display:none;flex-direction:column;z-index:20
+}
+.chatHeader{
+  height:78px;display:flex;align-items:center;gap:8px;
+  padding:8px;border-bottom:1px solid #0876b7;background:#071923
+}
+.back{
+  width:42px;height:42px;border:0;background:transparent;
+  color:#fff;font-size:30px
+}
+.chatAv{
+  width:49px;height:49px;border:2px solid #08c8ff;
+  border-radius:50%;display:grid;place-items:center;
+  font-weight:bold;overflow:hidden
+}
+.chatAv img{width:100%;height:100%;object-fit:cover}
+.chatTitle{flex:1;min-width:0}
+.chatTitle b{display:block;font-size:17px}
+.chatTitle span{display:block;color:#91aabd;font-size:11px;margin-top:4px}
+.callBtn{width:44px;height:44px;font-size:20px}
+.video{background:#00a987}
+
+.messages{
+  flex:1;overflow:auto;padding:13px 10px;
+  display:flex;flex-direction:column;gap:8px
+}
+.msg{
+  max-width:84%;padding:9px 11px;background:#162b40;
+  border-radius:16px;align-self:flex-start
+}
+.msg.mine{align-self:flex-end;background:#007c69}
+.msgText{font-size:16px;word-break:break-word}
+.msgTime{text-align:right;font-size:9px;color:#b8c8cf;margin-top:4px}
+.msg img,.msg video{max-width:100%;border-radius:10px;display:block}
+.msg audio{max-width:100%}
+.fileLink{color:#fff;text-decoration:none;font-weight:bold}
+
+.compose{
+  min-height:68px;display:flex;align-items:center;gap:5px;
+  padding:8px;background:#071923;border-top:1px solid #104965
+}
+.compose input{
+  flex:1;min-width:0;height:49px;border:1px solid #174c6c;
+  border-radius:25px;background:#06131d;color:#fff;
+  padding:0 15px;outline:0
+}
+.action{width:42px;height:42px;border-radius:50%}
+.send{
+  width:48px;height:48px;border:0;border-radius:50%;
+  background:linear-gradient(135deg,#08cfff,#00d19d);
+  color:#fff;font-size:20px
+}
+
+.storyViewer{
+  display:none;position:fixed;inset:0;z-index:200;
+  background:#000;align-items:center;justify-content:center
+}
+.storyViewer img,.storyViewer video{
+  max-width:100%;max-height:100%;object-fit:contain
+}
+.storyClose{
+  position:absolute;top:15px;right:15px;z-index:5;
+  width:45px;height:45px;border:0;border-radius:50%;
+  background:#ffffff22;color:#fff;font-size:25px
+}
+
+.admin{
+  display:none;position:fixed;inset:0;z-index:150;
+  background:#06121b;overflow:auto;padding:15px
+}
+.adminBox{
+  max-width:700px;margin:auto;background:#071923;
+  border:1px solid #08c8ff;border-radius:20px;padding:18px
+}
+.adminBox input{
+  width:100%;height:45px;margin:6px 0 10px;
+  border:1px solid #174c6c;border-radius:10px;
+  background:#06131d;color:#fff;padding:0 12px
+}
+.adminRow{
+  display:flex;align-items:center;gap:10px;
+  padding:12px;border-bottom:1px solid #164256
+}
+.adminBtn{
+  border:0;border-radius:10px;padding:10px 14px;
+  background:#123248;color:#fff
+}
+.danger{background:#d63b4e}
+.success{background:#00a884}
+.adminClose{float:right}
+
+.call{
+  display:none;position:fixed;z-index:300;inset:0;
+  background:#000d;align-items:center;justify-content:center;padding:12px
+}
+.callBox{
+  width:min(700px,100%);background:#071722;
+  border:1px solid #08c8ff;border-radius:20px;padding:15px
+}
+.callHead{display:flex;justify-content:space-between;align-items:center}
+.close{
+  width:40px;height:40px;border:1px solid #31556b;
+  border-radius:10px;background:#142936;color:#fff
+}
+.videos{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.videoBox{background:#000;border-radius:13px;overflow:hidden;min-height:220px}
+.videoBox video{
+  width:100%;height:100%;min-height:220px;object-fit:cover
+}
+.controls{
+  display:flex;justify-content:center;gap:8px;
+  margin-top:12px;flex-wrap:wrap
+}
+.control{
+  border:0;border-radius:11px;padding:12px 17px;
+  background:#123248;color:#fff
+}
+.end{background:#d63b4e}
+.accept{background:#00a884}
+.incoming{text-align:center;padding:25px}
+
+@media(max-width:600px){
+  .videos{grid-template-columns:1fr}
+  .videoBox,.videoBox video{min-height:180px}
+}
+</style>
+</head>
+
+<body>
+
+<!-- LOGIN -->
+<div id="login">
+  <div class="loginBox">
+    <div class="logo">SF</div>
+    <h1>Secret Frame</h1>
+    <div class="sub">🔒 Private • Real-time Chat</div>
+
+    <input id="loginId" type="tel"
+           inputmode="numeric" maxlength="10"
+           placeholder="Mobile Number">
+
+    <input id="loginPassword"
+           type="password"
+           placeholder="Password">
+
+    <button class="loginBtn" onclick="login()">Login</button>
+
+    <div id="error" class="error"></div>
+    <div class="hint">Password: <b>1234</b></div>
+  </div>
+</div>
+
+
+<!-- APP -->
+<div id="app">
+
+  <div class="chats">
+
+    <div class="top">
+      <div class="topLogo" id="topLogo">SF</div>
+
+      <div class="topTitle">
+        <b id="appTitle">Secret Frame</b>
+        <span>🔒 Private Messages</span>
+      </div>
+
+      <button class="menu" onclick="openAdmin()">⚙️</button>
+    </div>
+
+    <div class="search">
+      <input id="search"
+             placeholder="🔍 Search friends..."
+             oninput="searchPeople()">
+    </div>
+
+    <div id="stories" class="stories"></div>
+
+    <div id="people" class="list"></div>
+
+  </div>
+
+
+  <!-- CHAT -->
+  <div id="chat" class="chat">
+
+    <div class="chatHeader">
+
+      <button class="back" onclick="closeChat()">‹</button>
+
+      <div id="chatAvatar" class="chatAv">F</div>
+
+      <div class="chatTitle">
+        <b id="chatName">Friend</b>
+        <span>🔒 Private • Real-time</span>
+      </div>
+
+      <button class="callBtn"
+              onclick="startCall('audio')">📞</button>
+
+      <button class="callBtn video"
+              onclick="startCall('video')">📹</button>
+
+    </div>
+
+    <div id="messages" class="messages"></div>
+
+    <form class="compose" onsubmit="sendMessage(event)">
+
+      <button type="button"
+              class="action"
+              onclick="document.getElementById('mediaInput').click()">📷</button>
+
+      <button type="button"
+              class="action"
+              onclick="document.getElementById('fileInput').click()">📎</button>
+
+      <button type="button"
+              class="action"
+              onclick="startVoice()">🎤</button>
+
+      <input id="message"
+             placeholder="Message..."
+             autocomplete="off">
+
+      <button type="button"
+              class="action"
+              onclick="emoji()">😊</button>
+
+      <button class="send" type="submit">➤</button>
+
+      <input id="mediaInput"
+             type="file"
+             accept="image/*,video/*"
+             hidden
+             onchange="uploadMedia(this)">
+
+      <input id="fileInput"
+             type="file"
+             hidden
+             onchange="uploadFile(this)">
+
+    </form>
+
+  </div>
+
+</div>
+
+
+<!-- STORY VIEWER -->
+<div id="storyViewer" class="storyViewer">
+
+  <button class="storyClose"
+          onclick="closeStory()">✕</button>
+
+  <div id="storyContent"></div>
+
+</div>
+
+
+<!-- ADMIN -->
+<div id="admin" class="admin">
+
+  <div class="adminBox">
+
+    <button class="adminBtn adminClose"
+            onclick="closeAdmin()">✕ Close</button>
+
+    <h2>👑 Secret Frame Admin</h2>
+
+    <p id="adminInfo"></p>
+
+    <hr>
+
+    <h3>🎨 App Customization</h3>
+
+    <label>Website/App Name</label>
+    <input id="customName"
+           placeholder="Secret Frame">
+
+    <label>Welcome Text</label>
+    <input id="customWelcome"
+           placeholder="Private • Real-time Chat">
+
+    <button class="adminBtn success"
+            onclick="saveCustomization()">
+      💾 Save Customization
+    </button>
+
+    <hr>
+
+    <h3>🖼️ App Logo</h3>
+
+    <input id="logoInput"
+           type="file"
+           accept="image/*"
+           onchange="uploadLogo(this)">
+
+    <hr>
+
+    <h3>👥 Members</h3>
+
+    <div id="adminMembers"></div>
+
+    <hr>
+
+    <p>
+      Total Members:
+      <b id="memberCount">0</b>
+    </p>
+
+    <button class="adminBtn"
+            onclick="logout()">🚪 Logout</button>
+
+  </div>
+</div>
+
+
+<!-- CALL -->
+<div id="call" class="call">
+
+  <div class="callBox">
+
+    <div class="callHead">
+      <h3 id="callTitle">Secret Frame Call</h3>
+      <button class="close" onclick="endCall()">✕</button>
+    </div>
+
+    <div id="incoming"
+         class="incoming"
+         style="display:none">
+
+      <div style="font-size:55px">📞</div>
+
+      <h2 id="incomingName">Incoming Call</h2>
+
+      <p id="incomingType"></p>
+
+      <div class="controls">
+
+        <button class="control accept"
+                onclick="acceptCall()">✓ Accept</button>
+
+        <button class="control end"
+                onclick="rejectCall()">✕ Reject</button>
+
+      </div>
+    </div>
+
+    <div id="activeCall"
+         style="display:none">
+
+      <div class="videos">
+
+        <div class="videoBox">
+          <video id="localVideo"
+                 autoplay muted playsinline></video>
+        </div>
+
+        <div class="videoBox">
+          <video id="remoteVideo"
+                 autoplay playsinline></video>
+        </div>
+
+      </div>
+
+      <div class="controls">
+
+        <button class="control"
+                onclick="toggleMic()">🎙️ Mic</button>
+
+        <button class="control"
+                onclick="toggleCamera()">📷 Camera</button>
+
+        <button class="control end"
+                onclick="endCall()">☎ End</button>
+
+      </div>
+
+    </div>
+
+  </div>
+</div>
+
+
+<script type="module">
+
+import {initializeApp}
+from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
+
+import {
+getDatabase,
+ref,
+push,
+set,
+onValue,
+onChildAdded
+}
+from "https://www.gstatic.com/firebasejs/12.1.0/firebase-database.js";
+
+import {
+getStorage,
+ref as storageRef,
+uploadBytes,
+getDownloadURL
+}
+from "https://www.gstatic.com/firebasejs/12.1.0/firebase-storage.js";
+
+
+/* ================= FIREBASE ================= */
+
+const firebaseConfig = {
+
+  apiKey:"AIzaSyB7B00ndag8PE78pjLxFg4iok9-9_U5bz0",
+
+  authDomain:"secret-frame-698ba.firebaseapp.com",
+
+  databaseURL:
+  "https://secret-frame-698ba-default-rtdb.asia-southeast1.firebasedatabase.app",
+
+  projectId:"secret-frame-698ba",
+
+  storageBucket:
+  "secret-frame-698ba.firebasestorage.app",
+
+  messagingSenderId:"601470862803",
+
+  appId:
+  "1:601470862803:web:3b666e06133804609b9b26"
+};
+
+const app=initializeApp(firebaseConfig);
+const db=getDatabase(app);
+const storage=getStorage(app);
+
+
+/* ================= MEMBERS ================= */
+
+const MEMBERS=[
+
+  {
+    phone:"7209000233",
+    name:"Admin",
+    password:"1234"
+  },
+
+  {
+    phone:"9771094346",
+    name:"Member 2",
+    password:"1234"
+  },
+
+  {
+    phone:"9939960113",
+    name:"Member 3",
+    password:"1234"
+  },
+
+  {
+    phone:"7337753903",
+    name:"Member 4",
+    password:"1234"
+  }
+
+];
+
+
+/* FINAL ADMIN */
+
+const ADMIN_PHONE="7209000233";
+const ADMIN_PASSWORD="1234";
+
+
+let me=localStorage.getItem("sfPhone")||"";
+let myName=localStorage.getItem("sfName")||"";
+
+let selected=null;
+let messageListener=null;
+
+let pc=null;
+let stream=null;
+let callId=null;
+let callType="audio";
+let incoming=null;
+
+
+/* ================= HELPERS ================= */
+
+function cleanPhone(x){
+  return String(x||"").replace(/\D/g,"").slice(-10);
+}
+
+function chatId(a,b){
+  return [cleanPhone(a),cleanPhone(b)].sort().join("_");
+}
+
+function time(t){
+  return new Date(t||Date.now())
+  .toLocaleTimeString([],{
+    hour:"2-digit",
+    minute:"2-digit"
+  });
+}
+
+
+/* ================= LOGIN ================= */
+
+window.login=function(){
+
+  const phone=cleanPhone(
+    document.getElementById("loginId").value
+  );
+
+  const password=
+    document.getElementById("loginPassword").value.trim();
+
+  const error=
+    document.getElementById("error");
+
+  error.textContent="";
+
+  const member=
+    MEMBERS.find(m=>m.phone===phone);
+
+  if(!member){
+    error.textContent=
+    "यह Mobile Number registered नहीं है।";
+    return;
+  }
+
+  if(member.password!==password){
+    error.textContent="Password गलत है।";
+    return;
+  }
+
+  me=member.phone;
+  myName=member.name;
+
+  localStorage.setItem("sfPhone",me);
+  localStorage.setItem("sfName",myName);
+
+  openApp();
+};
+
+
+/* ================= OPEN APP ================= */
+
+function openApp(){
+
+  document.getElementById("login")
+  .style.display="none";
+
+  document.getElementById("app")
+  .style.display="block";
+
+  loadCustomization();
+  loadMembers();
+  loadStories();
+  listenIncomingCalls();
+
+}
+
+
+/* ================= MEMBERS ================= */
+
+function loadMembers(){
+
+  const box=
+    document.getElementById("people");
+
+  box.innerHTML="";
+
+  MEMBERS.forEach(member=>{
+
+    if(member.phone===me)return;
+
+    const row=
+      document.createElement("div");
+
+    row.className="person";
+
+    row.dataset.name=
+      member.name.toLowerCase();
+
+    row.innerHTML=`
+
+      <div class="avatar">
+        ${member.name.substring(0,2).toUpperCase()}
+      </div>
+
+      <div class="info">
+
+        <div class="name">
+          ${member.name}
+          <span class="dot"></span>
+        </div>
+
+        <div class="status"
+             id="last-${cleanPhone(member.phone)}">
+          Start a private chat
+        </div>
+
+      </div>
+    `;
+
+    row.onclick=
+      ()=>openChat(member);
+
+    box.appendChild(row);
+
+    listenLastMessage(member);
+
+  });
+}
+
+
+/* ================= LAST MESSAGE ================= */
+
+function listenLastMessage(member){
+
+  onValue(
+
+    ref(
+      db,
+      "privateChats/"+
+      chatId(me,member.phone)+
+      "/messages"
+    ),
+
+    snap=>{
+
+      const data=snap.val()||{};
+      const arr=Object.values(data);
+
+      if(!arr.length)return;
+
+      arr.sort(
+        (a,b)=>
+        (a.createdAt||0)-
+        (b.createdAt||0)
+      );
+
+      const last=arr[arr.length-1];
+
+      const box=
+        document.getElementById(
+          "last-"+cleanPhone(member.phone)
+        );
+
+      if(box){
+
+        box.textContent=
+          last.sender===me
+          ? "You: "+(last.text||"Media")
+          : (last.text||"Media");
+
+      }
+    }
+  );
+}
+
+
+/* ================= OPEN CHAT ================= */
+
+window.openChat=function(member){
+
+  selected=member;
+
+  document.getElementById("chatName")
+  .textContent=member.name;
+
+  document.getElementById("chatAvatar")
+  .textContent=
+    member.name.substring(0,2).toUpperCase();
+
+  document.getElementById("chat")
+  .style.display="flex";
+
+  loadMessages();
+
+};
+
+
+/* ================= LOAD MESSAGES ================= */
+
+function loadMessages(){
+
+  const box=
+    document.getElementById("messages");
+
+  box.innerHTML="";
+
+  if(messageListener){
+    messageListener();
+    messageListener=null;
+  }
+
+  if(!selected)return;
+
+  messageListener=
+
+  onChildAdded(
+
+    ref(
+      db,
+      "privateChats/"+
+      chatId(me,selected.phone)+
+      "/messages"
+    ),
+
+    snap=>{
+
+      const data=snap.val();
+
+      if(!data)return;
+
+      const msg=
+        document.createElement("div");
+
+      msg.className=
+        "msg "+
+        (data.sender===me?"mine":"");
+
+
+      if(data.type==="image"){
+
+        msg.innerHTML=`
+          <img src="${data.url}">
+          <div class="msgTime">
+            ${time(data.createdAt)}
+          </div>
+        `;
+
+      }
+
+      else if(data.type==="video"){
+
+        msg.innerHTML=`
+          <video src="${data.url}"
+                 controls
+                 playsinline></video>
+          <div class="msgTime">
+            ${time(data.createdAt)}
+          </div>
+        `;
+
+      }
+
+      else if(data.type==="audio"){
+
+        msg.innerHTML=`
+          <audio src="${data.url}"
+                 controls></audio>
+          <div class="msgTime">
+            ${time(data.createdAt)}
+          </div>
+        `;
+
+      }
+
+      else if(data.type==="file"){
+
+        msg.innerHTML=`
+          <a class="fileLink"
+             href="${data.url}"
+             target="_blank"
+             rel="noopener">
+             📎 ${String(data.name||"File")}
+          </a>
+          <div class="msgTime">
+            ${time(data.createdAt)}
+          </div>
+        `;
+
+      }
+
+      else{
+
+        msg.innerHTML=`
+          <div class="msgText"></div>
+          <div class="msgTime">
+            ${time(data.createdAt)}
+            ${data.sender===me?" ✓✓":""}
+          </div>
+        `;
+
+        msg.querySelector(".msgText")
+        .textContent=data.text||"";
+
+      }
+
+      box.appendChild(msg);
+
+      box.scrollTop=box.scrollHeight;
+
+    }
+  );
+}
+
+
+/* ================= SEND MESSAGE ================= */
+
+window.sendMessage=
+async function(e){
+
+  e.preventDefault();
+
+  if(!selected)return;
+
+  const input=
+    document.getElementById("message");
+
+  const text=
+    input.value.trim();
+
+  if(!text)return;
+
+  await push(
+
+    ref(
+      db,
+      "privateChats/"+
+      chatId(me,selected.phone)+
+      "/messages"
+    ),
+
+    {
+      sender:me,
+      senderName:myName,
+      receiver:selected.phone,
+      type:"text",
+      text:text,
+      createdAt:Date.now()
+    }
+
+  );
+
+  input.value="";
+
+};
+
+
+/* ================= EMOJI ================= */
+
+window.emoji=function(){
+
+  const input=
+    document.getElementById("message");
+
+  input.value+=" 😊";
+  input.focus();
+
+};
+
+
+/* ================= MEDIA UPLOAD ================= */
+
+async function uploadToFirebase(file,type){
+
+  if(!selected){
+    alert("पहले chat खोलें।");
+    return;
+  }
+
+  try{
+
+    const path=
+      "chatMedia/"+
+      chatId(me,selected.phone)+"/"+
+      Date.now()+"_"+file.name;
+
+    const fileRef=
+      storageRef(storage,path);
+
+    await uploadBytes(
+      fileRef,
+      file
+    );
+
+    const url=
+      await getDownloadURL(fileRef);
+
+    await push(
+
+      ref(
+        db,
+        "privateChats/"+
+        chatId(me,selected.phone)+
+        "/messages"
+      ),
+
+      {
+        sender:me,
+        senderName:myName,
+        receiver:selected.phone,
+        type:type,
+        url:url,
+        name:file.name,
+        createdAt:Date.now()
+      }
+    );
+
+  }catch(error){
+
+    console.error(error);
+
+    alert(
+      "Upload नहीं हुआ। Firebase Storage Rules check करें।"
+    );
+  }
+}
+
+
+window.uploadMedia=function(input){
+
+  const file=input.files[0];
+
+  if(!file)return;
+
+  const type=
+    file.type.startsWith("video/")
+    ? "video"
+    : "image";
+
+  uploadToFirebase(file,type);
+
+  input.value="";
+};
+
+
+window.uploadFile=function(input){
+
+  const file=input.files[0];
+
+  if(!file)return;
+
+  uploadToFirebase(file,"file");
+
+  input.value="";
+};
+
+
+/* ================= VOICE ================= */
+
+let recorder=null;
+let voiceChunks=[];
+
+window.startVoice=
+async function(){
+
+  if(!selected){
+    alert("पहले chat खोलें।");
+    return;
+  }
+
+  try{
+
+    const audioStream=
+      await navigator.mediaDevices
+      .getUserMedia({audio:true});
+
+    voiceChunks=[];
+
+    recorder=
+      new MediaRecorder(audioStream);
+
+    recorder.ondataavailable=e=>{
+
+      if(e.data.size)
+        voiceChunks.push(e.data);
+
+    };
+
+    recorder.onstop=async()=>{
+
+      audioStream.getTracks()
+      .forEach(t=>t.stop());
+
+      const blob=
+        new Blob(
+          voiceChunks,
+          {type:"audio/webm"}
+        );
+
+      const file=
+        new File(
+          [blob],
+          "voice_"+Date.now()+".webm",
+          {type:"audio/webm"}
+        );
+
+      await uploadToFirebase(
+        file,
+        "audio"
+      );
+    };
+
+    recorder.start();
+
+    alert("🎤 5 सेकंड की recording शुरू हो गई।");
+
+    setTimeout(()=>{
+
+      if(
+        recorder &&
+        recorder.state==="recording"
+      ){
+        recorder.stop();
+      }
+
+    },5000);
+
+  }catch(e){
+
+    alert("Microphone permission दें।");
+
+  }
+};
+
+
+/* ================= SEARCH ================= */
+
+window.searchPeople=function(){
+
+  const q=
+    document.getElementById("search")
+    .value.toLowerCase();
+
+  document
+  .querySelectorAll(".person")
+  .forEach(row=>{
+
+    row.style.display=
+      row.dataset.name.includes(q)
+      ? "flex"
+      : "none";
+
+  });
+
+};
+
+
+/* ================= CLOSE CHAT ================= */
+
+window.closeChat=function(){
+
+  if(messageListener){
+    messageListener();
+    messageListener=null;
+  }
+
+  document.getElementById("chat")
+  .style.display="none";
+
+  selected=null;
+
+};
+
+
+/* ================= STORIES ================= */
+
+function loadStories(){
+
+  const box=
+    document.getElementById("stories");
+
+  box.innerHTML="";
+
+  const add=
+    document.createElement("div");
+
+  add.className="story";
+
+  add.innerHTML=`
+    <div class="storyAdd">+</div>
+    <div>My Story</div>
+  `;
+
+  add.onclick=()=>{
+
+    const input=
+      document.createElement("input");
+
+    input.type="file";
+    input.accept="image/*,video/*";
+
+    input.onchange=()=>{
+
+      if(input.files[0])
+        uploadStory(input.files[0]);
+
+    };
+
+    input.click();
+
+  };
+
+  box.appendChild(add);
+
+
+  onValue(
+
+    ref(db,"stories"),
+
+    snapshot=>{
+
+      const stories=
+        snapshot.val()||{};
+
+      Object.entries(stories)
+      .forEach(([id,story])=>{
+
+        if(
+          Date.now()-
+          (story.createdAt||0)
+          >
+          86400000
+        ){
+          return;
+        }
+
+        const item=
+          document.createElement("div");
+
+        item.className="story";
+
+        item.innerHTML=`
+
+          <img class="storyAvatar"
+               src="${story.url}">
+
+          <div>
+            ${story.name||"Member"}
+          </div>
+
+        `;
+
+        item.onclick=
+          ()=>openStory(story);
+
+        box.appendChild(item);
+
+      });
+
+    }
+  );
+}
+
+
+async function uploadStory(file){
+
+  try{
+
+    const path=
+      "stories/"+
+      me+"/"+
+      Date.now()+"_"+
+      file.name;
+
+    const fileRef=
+      storageRef(storage,path);
+
+    await uploadBytes(
+      fileRef,
+      file
+    );
+
+    const url=
+      await getDownloadURL(fileRef);
+
+    await push(
+
+      ref(db,"stories"),
+
+      {
+        owner:me,
+        name:myName,
+        url:url,
+        type:
+          file.type.startsWith("video/")
+          ? "video"
+          : "image",
+        createdAt:Date.now()
+      }
+
+    );
+
+    alert("✅ Story upload हो गई।");
+
+  }catch(e){
+
+    console.error(e);
+
+    alert(
+      "Story upload नहीं हुई। Firebase Storage check करें।"
+    );
+
+  }
+}
+
+
+window.openStory=function(story){
+
+  const viewer=
+    document.getElementById("storyViewer");
+
+  const content=
+    document.getElementById("storyContent");
+
+  content.innerHTML="";
+
+  if(story.type==="video"){
+
+    const video=
+      document.createElement("video");
+
+    video.src=story.url;
+    video.controls=true;
+    video.autoplay=true;
+    video.playsInline=true;
+
+    content.appendChild(video);
+
+  }else{
+
+    const img=
+      document.createElement("img");
+
+    img.src=story.url;
+
+    content.appendChild(img);
+
+  }
+
+  viewer.style.display="flex";
+
+};
+
+
+window.closeStory=function(){
+
+  document.getElementById("storyViewer")
+  .style.display="none";
+
+  document.getElementById("storyContent")
+  .innerHTML="";
+
+};
+
+
+/* ================= ADMIN ================= */
+
+window.openAdmin=function(){
+
+  if(me!==ADMIN_PHONE){
+
+    alert("Admin access नहीं है।");
+    return;
+  }
+
+  document.getElementById("admin")
+  .style.display="block";
+
+  document.getElementById("adminInfo")
+  .textContent=
+    "👑 Admin: "+myName+
+    " • "+ADMIN_PHONE;
+
+  document.getElementById("memberCount")
+  .textContent=MEMBERS.length;
+
+  document.getElementById("customName")
+  .value=
+    localStorage.getItem("sfCustomName")
+    ||"Secret Frame";
+
+  document.getElementById("customWelcome")
+  .value=
+    localStorage.getItem("sfCustomWelcome")
+    ||"Private • Real-time Chat";
+
+  renderAdminMembers();
+
+};
+
+
+function renderAdminMembers(){
+
+  const box=
+    document.getElementById("adminMembers");
+
+  box.innerHTML="";
+
+  MEMBERS.forEach(member=>{
+
+    const row=
+      document.createElement("div");
+
+    row.className="adminRow";
+
+    row.innerHTML=`
+
+      <div style="flex:1">
+        <b>${member.name}</b>
+        <br>
+        <small>${member.phone}</small>
+      </div>
+
+      ${
+        member.phone===ADMIN_PHONE
+        ?
+        '<span>👑 ADMIN</span>'
+        :
+        '<span>👤 MEMBER</span>'
+      }
+
+    `;
+
+    box.appendChild(row);
+
+  });
+
+}
+
+
+window.closeAdmin=function(){
+
+  document.getElementById("admin")
+  .style.display="none";
+
+};
+
+
+/* ================= CUSTOMIZATION ================= */
+
+window.saveCustomization=function(){
+
+  if(me!==ADMIN_PHONE){
+    alert("Admin access नहीं है।");
+    return;
+  }
+
+  const name=
+    document.getElementById("customName")
+    .value.trim();
+
+  const welcome=
+    document.getElementById("customWelcome")
+    .value.trim();
+
+  if(name){
+
+    localStorage.setItem(
+      "sfCustomName",
+      name
+    );
+
+  }
+
+  if(welcome){
+
+    localStorage.setItem(
+      "sfCustomWelcome",
+      welcome
+    );
+
+  }
+
+  loadCustomization();
+
+  alert("✅ Customization saved.");
+
+};
+
+
+function loadCustomization(){
+
+  const name=
+    localStorage.getItem("sfCustomName")
+    ||"Secret Frame";
+
+  const welcome=
+    localStorage.getItem("sfCustomWelcome")
+    ||"Private • Real-time Chat";
+
+  document.getElementById("appTitle")
+  .textContent=name;
+
+  document.title=name;
+
+  const sub=
+    document.querySelector(".topTitle span");
+
+  if(sub)
+    sub.textContent="🔒 "+welcome;
+
+}
+
+
+/* ================= LOGOUT ================= */
+
+window.logout=function(){
+
+  localStorage.removeItem("sfPhone");
+  localStorage.removeItem("sfName");
+
+  location.reload();
+
+};
+
+
+/* ================= WEBRTC ================= */
+
+const rtcConfig={
+  iceServers:[
+    {urls:"stun:stun.l.google.com:19302"},
+    {urls:"stun:stun1.l.google.com:19302"}
+  ]
+};
+
+
+window.startCall=
+async function(type){
+
+  if(!selected){
+
+    alert("पहले friend की chat खोलें।");
+    return;
+
+  }
+
+  try{
+
+    callType=type;
+
+    callId=
+      "call_"+Date.now()+"_"+
+      Math.random().toString(36).slice(2);
+
+    stream=
+      await navigator.mediaDevices
+      .getUserMedia({
+        audio:true,
+        video:type==="video"
+      });
+
+    pc=
+      new RTCPeerConnection(rtcConfig);
+
+    stream.getTracks().forEach(
+      track=>pc.addTrack(track,stream)
+    );
+
+    pc.ontrack=e=>{
+
+      if(e.streams[0])
+        document.getElementById("remoteVideo")
+        .srcObject=e.streams[0];
+
+    };
+
+    pc.onicecandidate=e=>{
+
+      if(!e.candidate)return;
+
+      set(
+        ref(
+          db,
+          "calls/"+callId+
+          "/callerCandidates/"+
+          Date.now()
+        ),
+        e.candidate.toJSON()
+      );
+
+    };
+
+    const offer=
+      await pc.createOffer();
+
+    await pc.setLocalDescription(offer);
+
+    await set(
+
+      ref(
+        db,
+        "calls/"+callId
+      ),
+
+      {
+        caller:me,
+        callerName:myName,
+        callee:selected.phone,
+        calleeName:selected.name,
+        type:type,
+        status:"ringing",
+        offer:{
+          type:offer.type,
+          sdp:offer.sdp
+        },
+        createdAt:Date.now()
+      }
+
+    );
+
+    showActive("Calling "+selected.name);
+
+    onValue(
+
+      ref(
+        db,
+        "calls/"+callId+"/answer"
+      ),
+
+      async snap=>{
+
+        const answer=snap.val();
+
+        if(
+          answer &&
+          pc &&
+          !pc.currentRemoteDescription
+        ){
+
+          await pc.setRemoteDescription(
+            new RTCSessionDescription(answer)
+          );
+
+          showActive("Connected");
+
+        }
+
+      }
+
+    );
+
+    onChildAdded(
+
+      ref(
+        db,
+        "calls/"+callId+
+        "/calleeCandidates"
+      ),
+
+      async snap=>{
+
+        if(!pc)return;
+
+        try{
+
+          await pc.addIceCandidate(
+            new RTCIceCandidate(
+              snap.val()
+            )
+          );
+
+        }catch(e){}
+
+      }
+
+    );
+
+  }catch(e){
+
+    alert(
+      "Camera/Microphone permission दें।\n\n"+
+      e.message
+    );
+
+    cleanup();
+
+  }
+
+};
+
+
+function listenIncomingCalls(){
+
+  onValue(
+
+    ref(db,"calls"),
+
+    snapshot=>{
+
+      const calls=
+        snapshot.val()||{};
+
+      for(const id in calls){
+
+        const c=calls[id];
+
+        if(
+          c &&
+          c.callee===me &&
+          c.status==="ringing" &&
+          !callId
+        ){
+
+          incoming={
+            id:id,
+            data:c
+          };
+
+          callId=id;
+          callType=c.type;
+
+          document.getElementById("call")
+          .style.display="flex";
+
+          document.getElementById("incoming")
+          .style.display="block";
+
+          document.getElementById("activeCall")
+          .style.display="none";
+
+          document.getElementById("incomingName")
+          .textContent=
+            c.callerName||"Friend";
+
+          document.getElementById("incomingType")
+          .textContent=
+            c.type==="video"
+            ? "📹 Video Call"
+            : "📞 Voice Call";
+
+          break;
+
+        }
+
+      }
+
+    }
+
+  );
+
+}
+
+
+window.acceptCall=
+async function(){
+
+  if(!incoming)return;
+
+  const c=incoming.data;
+
+  try{
+
+    stream=
+      await navigator.mediaDevices
+      .getUserMedia({
+        audio:true,
+        video:c.type==="video"
+      });
+
+    pc=
+      new RTCPeerConnection(rtcConfig);
+
+    stream.getTracks().forEach(
+      track=>pc.addTrack(track,stream)
+    );
+
+    pc.ontrack=e=>{
+
+      if(e.streams[0])
+        document.getElementById("remoteVideo")
+        .srcObject=e.streams[0];
+
+    };
+
+    pc.onicecandidate=e=>{
+
+      if(!e.candidate)return;
+
+      set(
+        ref(
+          db,
+          "calls/"+callId+
+          "/calleeCandidates/"+
+          Date.now()
+        ),
+        e.candidate.toJSON()
+      );
+
+    };
+
+    await pc.setRemoteDescription(
+      new RTCSessionDescription(c.offer)
+    );
+
+    const answer=
+      await pc.createAnswer();
+
+    await pc.setLocalDescription(answer);
+
+    await set(
+
+      ref(
+        db,
+        "calls/"+callId+"/answer"
+      ),
+
+      {
+        type:answer.type,
+        sdp:answer.sdp
+      }
+
+    );
+
+    await set(
+      ref(
+        db,
+        "calls/"+callId+"/status"
+      ),
+      "connected"
+    );
+
+    showActive("Connected");
+
+    onChildAdded(
+
+      ref(
+        db,
+        "calls/"+callId+
+        "/callerCandidates"
+      ),
+
+      async snap=>{
+
+        try{
+
+          await pc.addIceCandidate(
+            new RTCIceCandidate(
+              snap.val()
+            )
+          );
+
+        }catch(e){}
+
+      }
+
+    );
+
+  }catch(e){
+
+    alert(
+      "Call accept नहीं हुई:\n"+
+      e.message
+    );
+
+    cleanup();
+
+  }
+
+};
+
+
+window.rejectCall=
+async function(){
+
+  if(callId){
+
+    await set(
+      ref(
+        db,
+        "calls/"+callId+"/status"
+      ),
+      "rejected"
+    );
+
+  }
+
+  cleanup();
+
+};
+
+
+function showActive(title){
+
+  document.getElementById("call")
+  .style.display="flex";
+
+  document.getElementById("incoming")
+  .style.display="none";
+
+  document.getElementById("activeCall")
+  .style.display="block";
+
+  document.getElementById("callTitle")
+  .textContent="📞 "+title;
+
+  document.getElementById("localVideo")
+  .srcObject=stream;
+
+  if(callType==="audio"){
+
+    document.getElementById("localVideo")
+    .style.display="none";
+
+    document.getElementById("remoteVideo")
+    .style.display="none";
+
+  }else{
+
+    document.getElementById("localVideo")
+    .style.display="block";
+
+    document.getElementById("remoteVideo")
+    .style.display="block";
+
+  }
+
+}
+
+
+window.toggleMic=function(){
+
+  if(!stream)return;
+
+  const track=
+    stream.getAudioTracks()[0];
+
+  if(track)
+    track.enabled=!track.enabled;
+
+};
+
+
+window.toggleCamera=function(){
+
+  if(!stream)return;
+
+  const track=
+    stream.getVideoTracks()[0];
+
+  if(track)
+    track.enabled=!track.enabled;
+
+};
+
+
+window.endCall=
+async function(){
+
+  if(callId){
+
+    try{
+
+      await set(
+        ref(
+          db,
+          "calls/"+callId+"/status"
+        ),
+        "ended"
+      );
+
+    }catch(e){}
+
+  }
+
+  cleanup();
+
+};
+
+
+function cleanup(){
+
+  if(stream){
+
+    stream.getTracks()
+    .forEach(t=>t.stop());
+
+    stream=null;
+
+  }
+
+  if(pc){
+
+    pc.close();
+    pc=null;
+
+  }
+
+  document.getElementById("localVideo")
+  .srcObject=null;
+
+  document.getElementById("remoteVideo")
+  .srcObject=null;
+
+  document.getElementById("call")
+  .style.display="none";
+
+  document.getElementById("incoming")
+  .style.display="none";
+
+  document.getElementById("activeCall")
+  .style.display="none";
+
+  incoming=null;
+  callId=null;
+
+}
+
+
+/* ================= AUTO LOGIN ================= */
+
+if(me){
+
+  const member=
+    MEMBERS.find(
+      m=>m.phone===me
+    );
+
+  if(member){
+
+    myName=member.name;
+    openApp();
+
+  }else{
+
+    localStorage.removeItem("sfPhone");
+    localStorage.removeItem("sfName");
+
+  }
+
+}
+
+</script>
+
+</body>
+</html>
