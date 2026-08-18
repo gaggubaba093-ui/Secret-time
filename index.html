@@ -1,0 +1,1332 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Secret Frame</title>
+
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#06131d;color:white;font-family:Arial,sans-serif}
+button,input{font:inherit}
+button{cursor:pointer}
+
+#login{
+height:100vh;display:flex;align-items:center;justify-content:center;
+background:#020a10;padding:20px
+}
+.login{
+width:100%;max-width:390px;background:#091d29;padding:28px;
+border-radius:22px;border:1px solid #08c8ff;
+box-shadow:0 0 30px #008cff33
+}
+.logo{
+width:90px;height:90px;margin:auto;border:3px solid #08c8ff;
+border-radius:50%;display:grid;place-items:center;
+font-size:34px;font-weight:bold
+}
+h1{text-align:center}
+.sub{text-align:center;color:#9bb0bd}
+input{
+width:100%;height:50px;margin:7px 0;padding:0 15px;
+border-radius:12px;border:1px solid #174b67;
+background:#06131d;color:white;outline:none
+}
+.login button{
+width:100%;height:50px;border:0;border-radius:12px;
+background:#00bfa5;color:white;font-weight:bold
+}
+#error{color:#ff6375;text-align:center;min-height:25px}
+
+#app{display:none;height:100vh}
+.header{
+height:70px;display:flex;align-items:center;padding:10px;
+background:#09202d;border-bottom:1px solid #15475e
+}
+.headerLogo{
+width:48px;height:48px;border:2px solid #08c8ff;
+border-radius:50%;display:grid;place-items:center;
+overflow:hidden;font-weight:bold
+}
+.headerLogo img{width:100%;height:100%;object-fit:cover}
+.title{flex:1;margin-left:10px}
+.title b{font-size:19px}
+.title small{display:block;color:#8da6b5;margin-top:3px}
+.icon{
+width:42px;height:42px;margin-left:5px;
+border:1px solid #15516e;border-radius:10px;
+background:#0c2b3c;color:white
+}
+
+.search{padding:8px}
+.search input{margin:0;border-radius:25px}
+
+.stories{
+display:flex;gap:12px;padding:10px;
+overflow-x:auto;border-bottom:1px solid #123e51
+}
+.story{
+min-width:70px;text-align:center;font-size:11px
+}
+.storyCircle{
+width:62px;height:62px;border-radius:50%;
+border:3px solid #08c8ff;padding:2px;
+object-fit:cover;background:#102a38
+}
+.addStory{
+width:62px;height:62px;border-radius:50%;
+border:2px dashed #08c8ff;
+display:grid;place-items:center;
+font-size:28px;background:#0b2939
+}
+
+.members{height:calc(100vh - 250px);overflow:auto}
+.member{
+height:78px;display:flex;align-items:center;
+padding:9px 12px;border-bottom:1px solid #103444
+}
+.avatar{
+width:55px;height:55px;border-radius:50%;
+border:2px solid #08c8ff;display:grid;
+place-items:center;overflow:hidden;background:#102b3a;
+font-weight:bold
+}
+.avatar img{width:100%;height:100%;object-fit:cover}
+.memberInfo{margin-left:12px;flex:1}
+.memberInfo b{display:block}
+.memberInfo small{color:#8da6b5}
+
+#chat{
+display:none;position:fixed;inset:0;
+background:#06131d;z-index:20;
+flex-direction:column
+}
+.chatHead{
+height:70px;display:flex;align-items:center;
+padding:8px;background:#09202d;
+border-bottom:1px solid #15516e
+}
+.back{
+border:0;background:none;color:white;
+font-size:32px;width:40px
+}
+.chatAvatar{
+width:48px;height:48px;border-radius:50%;
+border:2px solid #08c8ff;display:grid;place-items:center;
+overflow:hidden
+}
+.chatAvatar img{width:100%;height:100%;object-fit:cover}
+.chatName{flex:1;margin-left:10px;font-weight:bold}
+.chatName small{display:block;color:#8da6b5;margin-top:3px}
+
+.messages{
+flex:1;overflow:auto;padding:12px;
+display:flex;flex-direction:column;gap:7px
+}
+.msg{
+max-width:82%;padding:9px 11px;
+background:#173246;border-radius:15px;
+align-self:flex-start;word-break:break-word
+}
+.msg.mine{align-self:flex-end;background:#007c69}
+.msg img,.msg video{max-width:100%;border-radius:9px}
+.msg audio{max-width:230px}
+.time{text-align:right;font-size:9px;color:#b8c7ce;margin-top:4px}
+
+.compose{
+display:flex;gap:5px;padding:7px;
+background:#09202d;border-top:1px solid #15475e
+}
+.compose input{margin:0;flex:1}
+.action{
+width:43px;height:43px;border-radius:50%;
+border:1px solid #15516e;background:#0b2a3a;color:white
+}
+.send{
+width:47px;height:47px;border:0;border-radius:50%;
+background:#00bfa5;color:white;font-size:20px
+}
+
+.viewer{
+display:none;position:fixed;inset:0;
+z-index:100;background:#000;
+align-items:center;justify-content:center
+}
+.viewer img,.viewer video{
+max-width:100%;max-height:100%
+}
+.close{
+position:absolute;right:15px;top:15px;
+width:42px;height:42px;border:0;border-radius:50%;
+background:#ffffff22;color:white;font-size:23px
+}
+
+#admin{
+display:none;position:fixed;inset:0;z-index:80;
+background:#06131d;overflow:auto;padding:15px
+}
+.adminBox{
+max-width:650px;margin:auto;background:#09202d;
+border:1px solid #08c8ff;border-radius:20px;padding:18px
+}
+.adminRow{
+padding:12px;border-bottom:1px solid #164355;
+display:flex;justify-content:space-between;align-items:center
+}
+.adminButton{
+border:0;border-radius:9px;padding:10px 14px;
+background:#0e4058;color:white
+}
+.green{background:#00a884}
+
+@media(max-width:500px){
+.members{height:calc(100vh - 235px)}
+}
+</style>
+</head>
+
+<body>
+
+<!-- LOGIN -->
+<section id="login">
+<div class="login">
+
+<div class="logo">SF</div>
+
+<h1>Secret Frame</h1>
+
+<p class="sub">Private Messaging</p>
+
+<input id="phone"
+type="tel"
+inputmode="numeric"
+maxlength="10"
+placeholder="Mobile Number">
+
+<input id="password"
+type="password"
+placeholder="Password">
+
+<button onclick="login()">LOGIN</button>
+
+<div id="error"></div>
+
+</div>
+</section>
+
+
+<!-- APP -->
+<section id="app">
+
+<div class="header">
+
+<div class="headerLogo" id="mainLogo">SF</div>
+
+<div class="title">
+<b id="appName">Secret Frame</b>
+<small id="welcome">Private Messaging</small>
+</div>
+
+<button class="icon" onclick="openAdmin()">⚙️</button>
+<button class="icon" onclick="logout()">↪</button>
+
+</div>
+
+
+<div class="search">
+<input id="search"
+placeholder="🔍 Search members"
+oninput="searchMembers()">
+</div>
+
+
+<!-- STORIES -->
+<div id="stories" class="stories"></div>
+
+
+<!-- MEMBERS -->
+<div id="members" class="members"></div>
+
+</section>
+
+
+<!-- CHAT -->
+<div id="chat">
+
+<div class="chatHead">
+
+<button class="back" onclick="closeChat()">‹</button>
+
+<div id="chatAvatar" class="chatAvatar">U</div>
+
+<div class="chatName">
+<span id="chatTitle">Member</span>
+<small>🔒 Private chat</small>
+</div>
+
+</div>
+
+<div id="messages" class="messages"></div>
+
+<form class="compose" onsubmit="sendText(event)">
+
+<button type="button"
+class="action"
+onclick="photoInput.click()">📷</button>
+
+<button type="button"
+class="action"
+onclick="fileInput.click()">📎</button>
+
+<button type="button"
+class="action"
+onclick="recordVoice()">🎤</button>
+
+<input id="message"
+placeholder="Message..."
+autocomplete="off">
+
+<button type="button"
+class="action"
+onclick="addEmoji()">😊</button>
+
+<button class="send">➤</button>
+
+<input id="photoInput"
+type="file"
+accept="image/*,video/*"
+hidden
+onchange="sendMedia(this)">
+
+<input id="fileInput"
+type="file"
+hidden
+onchange="sendFile(this)">
+
+</form>
+
+</div>
+
+
+<!-- STORY VIEWER -->
+<div id="viewer" class="viewer">
+
+<button class="close"
+onclick="closeStory()">✕</button>
+
+<div id="storyContent"></div>
+
+</div>
+
+
+<!-- ADMIN -->
+<div id="admin">
+
+<div class="adminBox">
+
+<button class="adminButton"
+style="float:right"
+onclick="closeAdmin()">✕</button>
+
+<h2>👑 Admin Panel</h2>
+
+<p>
+Admin:
+<b>7209000233</b>
+</p>
+
+<hr>
+
+<h3>🎨 Customize Website</h3>
+
+<input id="newName"
+placeholder="Website Name">
+
+<input id="newWelcome"
+placeholder="Welcome Text">
+
+<button class="adminButton green"
+onclick="saveSettings()">
+💾 Save
+</button>
+
+<hr>
+
+<h3>🖼️ Change Logo</h3>
+
+<input id="logoFile"
+type="file"
+accept="image/*"
+onchange="changeLogo(this)">
+
+<hr>
+
+<h3>👥 Members</h3>
+
+<div id="adminMembers"></div>
+
+</div>
+
+</div>
+
+
+<script type="module">
+
+import {initializeApp}
+from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
+
+import {
+getDatabase,
+ref,
+push,
+set,
+onValue,
+onChildAdded
+}
+from "https://www.gstatic.com/firebasejs/12.1.0/firebase-database.js";
+
+import {
+getStorage,
+ref as storageRef,
+uploadBytes,
+getDownloadURL
+}
+from "https://www.gstatic.com/firebasejs/12.1.0/firebase-storage.js";
+
+
+/* FIREBASE */
+
+const firebaseConfig={
+
+apiKey:"AIzaSyB7B00ndag8PE78pjLxFg4iok9-9_U5bz0",
+
+authDomain:"secret-frame-698ba.firebaseapp.com",
+
+databaseURL:
+"https://secret-frame-698ba-default-rtdb.asia-southeast1.firebasedatabase.app",
+
+projectId:"secret-frame-698ba",
+
+storageBucket:
+"secret-frame-698ba.firebasestorage.app",
+
+messagingSenderId:"601470862803",
+
+appId:"1:601470862803:web:3b666e06133804609b9b26"
+
+};
+
+const app=initializeApp(firebaseConfig);
+const db=getDatabase(app);
+const storage=getStorage(app);
+
+
+/* MEMBERS */
+
+const MEMBERS=[
+
+{
+phone:"7209000233",
+name:"Admin",
+password:"1234"
+},
+
+{
+phone:"9771094346",
+name:"Member 2",
+password:"1234"
+},
+
+{
+phone:"9939960113",
+name:"Member 3",
+password:"1234"
+},
+
+{
+phone:"7337753903",
+name:"Member 4",
+password:"1234"
+}
+
+];
+
+const ADMIN="7209000233";
+
+
+let me="";
+let myName="";
+let selected=null;
+let stopMessages=null;
+
+
+/* LOGIN */
+
+window.login=function(){
+
+const p=
+phone.value.replace(/\D/g,"");
+
+const pass=password.value;
+
+const user=
+MEMBERS.find(
+x=>x.phone===p
+);
+
+if(!user){
+
+error.textContent=
+"Mobile number registered नहीं है।";
+
+return;
+}
+
+if(user.password!==pass){
+
+error.textContent=
+"Password गलत है।";
+
+return;
+}
+
+me=user.phone;
+myName=user.name;
+
+localStorage.setItem("sfUser",me);
+
+document.getElementById("login")
+.style.display="none";
+
+document.getElementById("app")
+.style.display="block";
+
+loadSettings();
+showMembers();
+showStories();
+
+};
+
+
+/* AUTO LOGIN */
+
+const saved=
+localStorage.getItem("sfUser");
+
+if(saved){
+
+const user=
+MEMBERS.find(
+x=>x.phone===saved
+);
+
+if(user){
+
+me=user.phone;
+myName=user.name;
+
+document.getElementById("login")
+.style.display="none";
+
+document.getElementById("app")
+.style.display="block";
+
+loadSettings();
+showMembers();
+showStories();
+
+}
+
+}
+
+
+/* MEMBERS */
+
+function showMembers(){
+
+const box=
+document.getElementById("members");
+
+box.innerHTML="";
+
+MEMBERS.forEach(user=>{
+
+if(user.phone===me)return;
+
+const row=
+document.createElement("div");
+
+row.className="member";
+
+row.dataset.name=
+user.name.toLowerCase();
+
+row.innerHTML=`
+
+<div class="avatar">
+${user.name.substring(0,2)}
+</div>
+
+<div class="memberInfo">
+<b>${user.name}</b>
+<small>Online</small>
+</div>
+
+`;
+
+row.onclick=
+()=>openChat(user);
+
+box.appendChild(row);
+
+});
+
+}
+
+
+/* SEARCH */
+
+window.searchMembers=function(){
+
+const q=
+document.getElementById("search")
+.value.toLowerCase();
+
+document
+.querySelectorAll(".member")
+.forEach(x=>{
+
+x.style.display=
+x.dataset.name.includes(q)
+?"flex":"none";
+
+});
+
+};
+
+
+/* CHAT ID */
+
+function chatId(a,b){
+
+return [a,b].sort().join("_");
+
+}
+
+
+/* OPEN CHAT */
+
+function openChat(user){
+
+selected=user;
+
+document.getElementById("chat")
+.style.display="flex";
+
+document.getElementById("chatTitle")
+.textContent=user.name;
+
+document.getElementById("chatAvatar")
+.textContent=
+user.name.substring(0,2);
+
+loadMessages();
+
+}
+
+
+/* MESSAGES */
+
+function loadMessages(){
+
+const box=
+document.getElementById("messages");
+
+box.innerHTML="";
+
+if(stopMessages){
+stopMessages();
+}
+
+stopMessages=
+
+onChildAdded(
+
+ref(
+db,
+"chats/"+chatId(me,selected.phone)
+),
+
+snap=>{
+
+const m=snap.val();
+
+if(!m)return;
+
+const div=
+document.createElement("div");
+
+div.className=
+"msg "+
+(m.sender===me?"mine":"");
+
+if(m.type==="image"){
+
+div.innerHTML=`
+<img src="${m.url}">
+<div class="time">
+${new Date(m.time).toLocaleTimeString()}
+</div>
+`;
+
+}
+
+else if(m.type==="video"){
+
+div.innerHTML=`
+<video src="${m.url}"
+controls playsinline></video>
+<div class="time">
+${new Date(m.time).toLocaleTimeString()}
+</div>
+`;
+
+}
+
+else if(m.type==="audio"){
+
+div.innerHTML=`
+<audio src="${m.url}"
+controls></audio>
+<div class="time">
+${new Date(m.time).toLocaleTimeString()}
+</div>
+`;
+
+}
+
+else if(m.type==="file"){
+
+div.innerHTML=`
+<a href="${m.url}"
+target="_blank"
+style="color:white">
+📎 ${m.name}
+</a>
+<div class="time">
+${new Date(m.time).toLocaleTimeString()}
+</div>
+`;
+
+}
+
+else{
+
+div.textContent=m.text;
+
+const t=
+document.createElement("div");
+
+t.className="time";
+
+t.textContent=
+new Date(m.time).toLocaleTimeString();
+
+div.appendChild(t);
+
+}
+
+box.appendChild(div);
+
+box.scrollTop=box.scrollHeight;
+
+});
+
+}
+
+
+/* TEXT */
+
+window.sendText=
+async function(e){
+
+e.preventDefault();
+
+if(!selected)return;
+
+const input=
+document.getElementById("message");
+
+const text=input.value.trim();
+
+if(!text)return;
+
+await push(
+
+ref(
+db,
+"chats/"+chatId(me,selected.phone)
+),
+
+{
+sender:me,
+text:text,
+type:"text",
+time:Date.now()
+}
+
+);
+
+input.value="";
+
+};
+
+
+/* EMOJI */
+
+window.addEmoji=function(){
+
+const input=
+document.getElementById("message");
+
+input.value+=" 😊";
+input.focus();
+
+};
+
+
+/* UPLOAD */
+
+async function upload(file,type){
+
+if(!selected)return;
+
+try{
+
+const path=
+"files/"+chatId(me,selected.phone)+
+"/"+Date.now()+"_"+file.name;
+
+const sref=
+storageRef(storage,path);
+
+await uploadBytes(
+sref,
+file
+);
+
+const url=
+await getDownloadURL(sref);
+
+await push(
+
+ref(
+db,
+"chats/"+chatId(me,selected.phone)
+),
+
+{
+sender:me,
+type:type,
+url:url,
+name:file.name,
+time:Date.now()
+}
+
+);
+
+}catch(e){
+
+alert(
+"Upload failed. Firebase Storage Rules check करें।"
+);
+
+}
+
+}
+
+
+/* MEDIA */
+
+window.sendMedia=function(input){
+
+const file=input.files[0];
+
+if(!file)return;
+
+upload(
+file,
+file.type.startsWith("video/")
+?"video":"image"
+);
+
+input.value="";
+
+};
+
+
+/* FILE */
+
+window.sendFile=function(input){
+
+const file=input.files[0];
+
+if(!file)return;
+
+upload(file,"file");
+
+input.value="";
+
+};
+
+
+/* VOICE */
+
+window.recordVoice=
+async function(){
+
+if(!selected)return;
+
+try{
+
+const stream=
+await navigator.mediaDevices
+.getUserMedia({audio:true});
+
+const recorder=
+new MediaRecorder(stream);
+
+const chunks=[];
+
+recorder.ondataavailable=e=>{
+if(e.data.size)
+chunks.push(e.data);
+};
+
+recorder.onstop=async()=>{
+
+stream.getTracks()
+.forEach(x=>x.stop());
+
+const blob=
+new Blob(
+chunks,
+{type:"audio/webm"}
+);
+
+const file=
+new File(
+[blob],
+"voice.webm",
+{type:"audio/webm"}
+);
+
+upload(file,"audio");
+
+};
+
+recorder.start();
+
+alert("🎤 Recording 5 seconds...");
+
+setTimeout(
+()=>recorder.stop(),
+5000
+);
+
+}catch(e){
+
+alert("Microphone permission दें।");
+
+}
+
+};
+
+
+/* CLOSE CHAT */
+
+window.closeChat=function(){
+
+if(stopMessages){
+stopMessages();
+stopMessages=null;
+}
+
+document.getElementById("chat")
+.style.display="none";
+
+selected=null;
+
+};
+
+
+/* STORIES */
+
+function showStories(){
+
+const box=
+document.getElementById("stories");
+
+box.innerHTML="";
+
+const add=
+document.createElement("div");
+
+add.className="story";
+
+add.innerHTML=`
+<div class="addStory">+</div>
+<div>My Story</div>
+`;
+
+add.onclick=()=>{
+
+const input=
+document.createElement("input");
+
+input.type="file";
+input.accept="image/*,video/*";
+
+input.onchange=()=>{
+
+if(input.files[0])
+uploadStory(input.files[0]);
+
+};
+
+input.click();
+
+};
+
+box.appendChild(add);
+
+
+onValue(
+
+ref(db,"stories"),
+
+snap=>{
+
+const data=snap.val()||{};
+
+Object.values(data)
+.forEach(s=>{
+
+/* 24 HOURS */
+
+if(
+Date.now()-s.time>
+86400000
+)return;
+
+const item=
+document.createElement("div");
+
+item.className="story";
+
+item.innerHTML=`
+
+<img class="storyCircle"
+src="${s.url}">
+
+<div>${s.name}</div>
+
+`;
+
+item.onclick=
+()=>viewStory(s);
+
+box.appendChild(item);
+
+});
+
+});
+
+}
+
+
+/* STORY UPLOAD */
+
+async function uploadStory(file){
+
+try{
+
+const path=
+"stories/"+me+"/"+Date.now()+"_"+file.name;
+
+const sref=
+storageRef(storage,path);
+
+await uploadBytes(
+sref,
+file
+);
+
+const url=
+await getDownloadURL(sref);
+
+await push(
+
+ref(db,"stories"),
+
+{
+owner:me,
+name:myName,
+url:url,
+type:
+file.type.startsWith("video/")
+?"video":"image",
+time:Date.now()
+}
+
+);
+
+alert("✅ Story लग गई।");
+
+}catch(e){
+
+alert(
+"Story upload failed. Firebase Storage check करें।"
+);
+
+}
+
+}
+
+
+/* VIEW STORY */
+
+function viewStory(s){
+
+const viewer=
+document.getElementById("viewer");
+
+const content=
+document.getElementById("storyContent");
+
+content.innerHTML="";
+
+if(s.type==="video"){
+
+const v=
+document.createElement("video");
+
+v.src=s.url;
+v.controls=true;
+v.autoplay=true;
+
+content.appendChild(v);
+
+}else{
+
+const img=
+document.createElement("img");
+
+img.src=s.url;
+
+content.appendChild(img);
+
+}
+
+viewer.style.display="flex";
+
+}
+
+
+window.closeStory=function(){
+
+document.getElementById("viewer")
+.style.display="none";
+
+};
+
+
+/* ADMIN */
+
+window.openAdmin=function(){
+
+if(me!==ADMIN){
+
+alert("Admin access नहीं है।");
+
+return;
+
+}
+
+document.getElementById("admin")
+.style.display="block";
+
+document.getElementById("newName")
+.value=
+localStorage.getItem("siteName")
+||"Secret Frame";
+
+document.getElementById("newWelcome")
+.value=
+localStorage.getItem("siteWelcome")
+||"Private Messaging";
+
+const box=
+document.getElementById("adminMembers");
+
+box.innerHTML="";
+
+MEMBERS.forEach(m=>{
+
+const row=
+document.createElement("div");
+
+row.className="adminRow";
+
+row.innerHTML=`
+
+<div>
+<b>${m.name}</b><br>
+<small>${m.phone}</small>
+</div>
+
+<div>
+${
+m.phone===ADMIN
+?"👑 ADMIN"
+:"👤 MEMBER"
+}
+</div>
+
+`;
+
+box.appendChild(row);
+
+});
+
+};
+
+
+/* SAVE SETTINGS */
+
+window.saveSettings=function(){
+
+if(me!==ADMIN){
+
+alert("Admin access नहीं है।");
+return;
+
+}
+
+const name=
+document.getElementById("newName")
+.value.trim();
+
+const welcome=
+document.getElementById("newWelcome")
+.value.trim();
+
+localStorage.setItem(
+"siteName",
+name||"Secret Frame"
+);
+
+localStorage.setItem(
+"siteWelcome",
+welcome||"Private Messaging"
+);
+
+loadSettings();
+
+alert("✅ Saved");
+
+};
+
+
+/* LOGO */
+
+window.changeLogo=function(input){
+
+if(me!==ADMIN){
+
+alert("Admin access नहीं है.");
+return;
+
+}
+
+const file=input.files[0];
+
+if(!file)return;
+
+const reader=
+new FileReader();
+
+reader.onload=()=>{
+
+localStorage.setItem(
+"siteLogo",
+reader.result
+);
+
+loadSettings();
+
+};
+
+reader.readAsDataURL(file);
+
+};
+
+
+/* LOAD SETTINGS */
+
+function loadSettings(){
+
+const name=
+localStorage.getItem("siteName")
+||"Secret Frame";
+
+const welcome=
+localStorage.getItem("siteWelcome")
+||"Private Messaging";
+
+document.getElementById("appName")
+.textContent=name;
+
+document.getElementById("welcome")
+.textContent=welcome;
+
+document.title=name;
+
+const logo=
+localStorage.getItem("siteLogo");
+
+if(logo){
+
+document.getElementById("mainLogo")
+.innerHTML=
+`<img src="${logo}">`;
+
+}
+
+}
+
+
+/* CLOSE ADMIN */
+
+window.closeAdmin=function(){
+
+document.getElementById("admin")
+.style.display="none";
+
+};
+
+
+/* LOGOUT */
+
+window.logout=function(){
+
+localStorage.removeItem("sfUser");
+
+location.reload();
+
+};
+
+</script>
+
+</body>
+</html>
