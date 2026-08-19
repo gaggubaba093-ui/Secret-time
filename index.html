@@ -1,0 +1,1172 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Arslan Ki Duniya</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#03151e;color:#fff;font-family:Arial}
+button,input{font:inherit}
+button{cursor:pointer}
+.auth{min-height:100vh;display:grid;place-items:center;padding:20px}
+.box,.modalBox{background:#072631;border:1px solid #15c8ff;border-radius:24px;padding:22px;width:100%;max-width:440px}
+.logo,.avatar{border:3px solid #15c8ff;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#0b3542}
+.logo{width:90px;height:90px;margin:auto;font-size:28px}
+.avatar{width:50px;height:50px;min-width:50px;overflow:hidden}
+.avatar img{width:100%;height:100%;object-fit:cover}
+h1{text-align:center}
+input{width:100%;padding:14px;margin:6px 0;background:#031820;border:1px solid #285666;border-radius:13px;color:#fff}
+.btn{width:100%;padding:14px;border:0;border-radius:13px;margin-top:8px;background:#08bfa0;color:#fff;font-weight:bold}
+.red{background:#e5485b}
+.blue{background:#078e76}
+.link{background:none;border:0;color:#16c7ff;padding:10px}
+.top{height:70px;background:#072631;border-bottom:1px solid #164b5a;display:flex;align-items:center;gap:9px;padding:8px 12px}
+.title{flex:1;font-weight:bold;font-size:18px}
+.icon{width:43px;height:43px;border:0;border-radius:50%;background:#0b3a48;color:#fff}
+.users{padding-bottom:20px}
+.user{display:flex;align-items:center;gap:10px;padding:12px;border-bottom:1px solid #103743}
+.info{flex:1}.name{font-weight:bold;font-size:17px}
+.online{color:#4be39b;font-size:13px}.off{color:#899da5;font-size:13px}
+.chat{height:100vh;display:flex;flex-direction:column}
+.messages{flex:1;overflow:auto;padding:12px}
+.msg{background:#12333e;border-radius:16px;padding:10px 13px;max-width:80%;margin:6px 0}
+.mine{background:#087263;margin-left:auto}
+.compose{display:flex;gap:5px;padding:7px;background:#06242d}
+.compose input{margin:0;flex:1}
+.profile{padding:22px;max-width:500px;margin:auto;text-align:center}
+.modal{position:fixed;inset:0;background:#000c;display:grid;place-items:center;padding:20px;z-index:50}
+.groupCard{padding:14px;border-bottom:1px solid #174552}
+.small{color:#9eb5bd;font-size:13px}
+.row{display:flex;gap:8px}
+.row>*{flex:1}
+.member{display:flex;align-items:center;gap:10px;padding:8px}
+</style>
+</head>
+
+<body>
+<div id="app"></div>
+
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage-compat.js"></script>
+
+<script>
+
+const firebaseConfig={
+apiKey:"AIzaSyB7B00ndag8PE78pjLxFg4iok9-9_U5bz0",
+authDomain:"secret-frame-698ba.firebaseapp.com",
+databaseURL:"https://secret-frame-698ba-default-rtdb.asia-southeast1.firebasedatabase.app",
+projectId:"secret-frame-698ba",
+storageBucket:"secret-frame-698ba.firebasestorage.app",
+messagingSenderId:"601470862803",
+appId:"1:601470862803:web:3b666e06133804609b9b26"
+};
+
+firebase.initializeApp(firebaseConfig);
+
+const auth=firebase.auth();
+const db=firebase.database();
+const storage=firebase.storage();
+
+let me=null;
+let selected=null;
+let call=null;
+let stream=null;
+
+const $=x=>document.getElementById(x);
+
+function safe(x){
+return String(x||"").replace(/[&<>"']/g,a=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[a]));
+}
+
+function initials(n){
+return String(n||"U").split(/\s+/).slice(0,2).map(x=>x[0]).join("").toUpperCase();
+}
+
+function av(u){
+return u&&u.photo?
+`<div class="avatar"><img src="${safe(u.photo)}"></div>`:
+`<div class="avatar">${initials(u?.name)}</div>`;
+}
+
+function cid(a,b){return [a,b].sort().join("_")}
+
+
+/* AUTH */
+
+function authPage(sign=false){
+
+$("app").innerHTML=`
+<div class="auth">
+<div class="box">
+
+<div class="logo">AD</div>
+<h1>Arslan Ki Duniya</h1>
+
+<div id="err"></div>
+
+${sign?`<input id="name" placeholder="अपना नाम">`:""}
+
+<input id="email" type="email" placeholder="Email">
+<input id="pass" type="password" placeholder="Password">
+
+<button class="btn" id="go">
+${sign?"SIGN UP":"LOGIN"}
+</button>
+
+<div style="text-align:center">
+<button class="link" id="switch">
+${sign?"Already have account? Login":"New user? Sign Up"}
+</button>
+</div>
+
+</div>
+</div>`;
+
+$("switch").onclick=()=>authPage(!sign);
+
+$("go").onclick=async()=>{
+
+try{
+
+let email=$("email").value.trim();
+let pass=$("pass").value;
+
+if(pass.length<6)throw Error("Password कम से कम 6 characters रखें।");
+
+if(sign){
+
+let name=$("name").value.trim();
+if(!name)throw Error("नाम डालें।");
+
+let r=await auth.createUserWithEmailAndPassword(email,pass);
+
+await r.user.updateProfile({displayName:name});
+
+await db.ref("users/"+r.user.uid).set({
+uid:r.user.uid,
+name,
+email,
+photo:"",
+online:true,
+lastSeen:Date.now()
+});
+
+}else{
+
+await auth.signInWithEmailAndPassword(email,pass);
+
+}
+
+}catch(e){
+
+$("err").innerHTML=
+`<p style="color:#ff6575">${safe(e.message)}</p>`;
+
+}
+
+};
+
+}
+
+auth.onAuthStateChanged(async u=>{
+
+if(!u){
+me=null;
+authPage();
+return;
+}
+
+me=u;
+
+await db.ref("users/"+u.uid).update({
+name:u.displayName||u.email,
+email:u.email,
+online:true,
+lastSeen:Date.now()
+});
+
+db.ref("users/"+u.uid).onDisconnect().update({
+online:false,
+lastSeen:Date.now()
+});
+
+home();
+
+});
+
+
+/* HOME */
+
+async function home(){
+
+let snap=await db.ref("users/"+me.uid).once("value");
+let user=snap.val()||{};
+
+$("app").innerHTML=`
+
+<div class="top">
+${av(user)}
+<div class="title">Arslan Ki Duniya</div>
+<button class="icon" onclick="profile()">👤</button>
+<button class="icon" onclick="logout()">↪</button>
+</div>
+
+<div style="padding:10px">
+
+<input id="search" placeholder="🔎 User Search">
+
+<div class="row">
+<button class="btn" onclick="createGroup()">👥 Create Group</button>
+<button class="btn" onclick="showGroups()">💬 Groups</button>
+</div>
+
+</div>
+
+<div id="users" class="users"></div>
+`;
+
+$("search").oninput=users;
+
+users();
+}
+
+async function users(){
+
+let q=($("search")?.value||"").toLowerCase();
+
+let snap=await db.ref("users").once("value");
+
+let html="";
+
+snap.forEach(x=>{
+
+let u=x.val();
+
+if(u.uid===me.uid)return;
+
+if(q&&!String(u.name).toLowerCase().includes(q))return;
+
+html+=`
+
+<div class="user">
+
+${av(u)}
+
+<div class="info" onclick="chat('${u.uid}')">
+
+<div class="name">${safe(u.name)}</div>
+
+<div class="${u.online?"online":"off"}">
+${u.online?"🟢 Online":"⚫ Offline"}
+</div>
+
+</div>
+
+<button class="icon blue"
+onclick="startCall('${u.uid}','audio')">
+📞
+</button>
+
+<button class="icon"
+onclick="startCall('${u.uid}','video')">
+📹
+</button>
+
+</div>`;
+
+});
+
+$("users").innerHTML=html||"<p style='text-align:center'>कोई user नहीं मिला।</p>";
+}
+
+
+/* CHAT */
+
+async function chat(uid){
+
+selected=(
+await db.ref("users/"+uid).once("value")
+).val();
+
+let id=cid(me.uid,uid);
+
+$("app").innerHTML=`
+
+<div class="chat">
+
+<div class="top">
+
+<button class="link" onclick="home()">←</button>
+
+${av(selected)}
+
+<div class="title">${safe(selected.name)}</div>
+
+<button class="icon blue"
+onclick="startCall('${uid}','audio')">📞</button>
+
+<button class="icon"
+onclick="startCall('${uid}','video')">📹</button>
+
+</div>
+
+<div id="messages" class="messages"></div>
+
+<div class="compose">
+
+<input id="text" placeholder="Message...">
+
+<button class="icon blue"
+onclick="send()">➤</button>
+
+</div>
+
+</div>
+`;
+
+db.ref("chats/"+id).on("value",renderChat);
+
+}
+
+
+function renderChat(s){
+
+let box=$("messages");
+if(!box)return;
+
+box.innerHTML="";
+
+s.forEach(x=>{
+
+let m=x.val();
+
+let d=document.createElement("div");
+
+d.className="msg "+(m.from===me.uid?"mine":"");
+
+d.textContent=m.text||"";
+
+box.appendChild(d);
+
+});
+
+box.scrollTop=box.scrollHeight;
+}
+
+
+async function send(){
+
+let text=$("text").value.trim();
+
+if(!text)return;
+
+$("text").value="";
+
+await db.ref(
+"chats/"+cid(me.uid,selected.uid)
+).push({
+
+from:me.uid,
+to:selected.uid,
+text,
+time:Date.now()
+
+});
+
+}
+
+
+/* PROFILE */
+
+async function profile(){
+
+let u=(
+await db.ref("users/"+me.uid).once("value")
+).val();
+
+$("app").innerHTML=`
+
+<div class="profile">
+
+<button class="link" onclick="home()">← Back</button>
+
+${av(u)}
+
+<h2>${safe(u.name)}</h2>
+
+<p class="small">${safe(u.email)}</p>
+
+<input id="photo" type="file" accept="image/*">
+
+<button class="btn" onclick="uploadPhoto()">
+📷 Profile Photo
+</button>
+
+<button class="btn" onclick="testNotify()">
+🔔 Test Notification
+</button>
+
+<button class="btn red" onclick="logout()">
+🚪 LOGOUT
+</button>
+
+</div>
+`;
+
+}
+
+async function uploadPhoto(){
+
+let file=$("photo").files[0];
+
+if(!file)return alert("Photo select करो।");
+
+let ref=storage.ref(
+"profiles/"+me.uid+"/"+Date.now()
+);
+
+await ref.put(file);
+
+let url=await ref.getDownloadURL();
+
+await db.ref("users/"+me.uid).update({
+photo:url
+});
+
+alert("Profile photo लग गई ✅");
+
+profile();
+
+}
+
+
+async function logout(){
+
+await db.ref("users/"+me.uid).update({
+online:false,
+lastSeen:Date.now()
+});
+
+await auth.signOut();
+
+}
+
+
+async function testNotify(){
+
+if(!("Notification" in window))
+return alert("Browser notification support नहीं करता।");
+
+let p=await Notification.requestPermission();
+
+if(p==="granted")
+new Notification("Arslan Ki Duniya",{
+body:"Notification working ✅"
+});
+
+}
+
+
+/* GROUP CREATE */
+
+async function createGroup(){
+
+$("app").innerHTML=`
+
+<div class="profile">
+
+<button class="link" onclick="home()">← Back</button>
+
+<h2>👥 Create Group</h2>
+
+<input id="gname" placeholder="Group Name">
+
+<input id="gphoto" type="file" accept="image/*">
+
+<p class="small">
+नीचे users select करें:
+</p>
+
+<div id="members"></div>
+
+<button class="btn" onclick="saveGroup()">
+CREATE GROUP
+</button>
+
+</div>
+`;
+
+let snap=await db.ref("users").once("value");
+
+let html="";
+
+snap.forEach(x=>{
+
+let u=x.val();
+
+if(u.uid===me.uid)return;
+
+html+=`
+
+<label class="member">
+
+<input
+type="checkbox"
+value="${u.uid}"
+style="width:auto">
+
+${av(u)}
+
+<span>${safe(u.name)}</span>
+
+</label>
+`;
+
+});
+
+$("members").innerHTML=html;
+
+}
+
+
+async function saveGroup(){
+
+let name=$("gname").value.trim();
+
+if(!name)
+return alert("Group name डालें।");
+
+let members=[me.uid];
+
+document
+.querySelectorAll(
+"#members input[type=checkbox]:checked"
+)
+.forEach(x=>members.push(x.value));
+
+let id=db.ref("groups").push().key;
+
+let file=$("gphoto").files[0];
+
+let photo="";
+
+if(file){
+
+let ref=storage.ref(
+"groups/"+id+"/"+Date.now()
+);
+
+await ref.put(file);
+
+photo=await ref.getDownloadURL();
+
+}
+
+await db.ref("groups/"+id).set({
+
+id,
+name,
+photo,
+admin:me.uid,
+members,
+created:Date.now()
+
+});
+
+alert("Group बन गया ✅");
+
+showGroups();
+
+}
+
+
+/* GROUP LIST */
+
+async function showGroups(){
+
+$("app").innerHTML=`
+
+<div class="top">
+<button class="link" onclick="home()">←</button>
+<div class="title">👥 My Groups</div>
+</div>
+
+<div id="groups"></div>
+`;
+
+let snap=await db.ref("groups").once("value");
+
+let html="";
+
+snap.forEach(x=>{
+
+let g=x.val();
+
+if(!g.members||!g.members.includes(me.uid))
+return;
+
+html+=`
+
+<div class="groupCard"
+onclick="groupChat('${g.id}')">
+
+<h3>👥 ${safe(g.name)}</h3>
+
+<p class="small">
+${g.members.length} Members
+</p>
+
+</div>
+`;
+
+});
+
+$("groups").innerHTML=
+html||"<p style='padding:20px'>अभी कोई group नहीं है।</p>";
+
+}
+
+
+/* GROUP CHAT */
+
+async function groupChat(id){
+
+let snap=
+await db.ref("groups/"+id).once("value");
+
+let g=snap.val();
+
+$("app").innerHTML=`
+
+<div class="chat">
+
+<div class="top">
+
+<button class="link" onclick="showGroups()">←</button>
+
+<div class="title">
+👥 ${safe(g.name)}
+</div>
+
+<button class="icon"
+onclick="groupInfo('${id}')">
+ℹ️
+</button>
+
+<button class="icon blue"
+onclick="groupCall('${id}','audio')">
+📞
+</button>
+
+<button class="icon"
+onclick="groupCall('${id}','video')">
+📹
+</button>
+
+</div>
+
+<div id="messages" class="messages"></div>
+
+<div class="compose">
+
+<input id="gtext"
+placeholder="Group Message...">
+
+<button class="icon blue"
+onclick="groupSend('${id}')">
+➤
+</button>
+
+</div>
+
+</div>
+`;
+
+db.ref("groupChats/"+id).on(
+"value",
+renderGroupChat
+);
+
+}
+
+
+function renderGroupChat(s){
+
+let box=$("messages");
+
+if(!box)return;
+
+box.innerHTML="";
+
+s.forEach(x=>{
+
+let m=x.val();
+
+let d=document.createElement("div");
+
+d.className=
+"msg "+
+(m.from===me.uid?"mine":"");
+
+d.textContent=
+(m.name?m.name+": ":"")+
+(m.text||"");
+
+box.appendChild(d);
+
+});
+
+box.scrollTop=box.scrollHeight;
+
+}
+
+
+async function groupSend(id){
+
+let text=$("gtext").value.trim();
+
+if(!text)return;
+
+$("gtext").value="";
+
+await db.ref(
+"groupChats/"+id
+).push({
+
+from:me.uid,
+name:me.displayName||me.email,
+text,
+time:Date.now()
+
+});
+
+}
+
+
+/* GROUP INFO / MEMBERS */
+
+async function groupInfo(id){
+
+let g=(
+await db.ref("groups/"+id).once("value")
+).val();
+
+let html=`
+
+<div class="modal" id="info">
+
+<div class="modalBox">
+
+<h2>👥 ${safe(g.name)}</h2>
+
+<p>Members: ${g.members.length}</p>
+
+`;
+
+for(let uid of g.members){
+
+let u=(
+await db.ref("users/"+uid).once("value")
+).val();
+
+html+=`
+
+<div class="member">
+
+${av(u)}
+
+<span>
+${safe(u.name)}
+${uid===g.admin?" 👑":""}
+</span>
+
+</div>
+`;
+
+}
+
+html+=`
+
+<button
+class="btn"
+onclick="document.getElementById('info').remove()">
+CLOSE
+</button>
+
+`;
+
+if(g.members.includes(me.uid)){
+
+html+=`
+
+<button
+class="btn red"
+onclick="leaveGroup('${id}')">
+🚪 Leave Group
+</button>
+
+`;
+
+}
+
+html+=`
+
+</div>
+</div>
+`;
+
+document.body.insertAdjacentHTML(
+"beforeend",
+html
+);
+
+}
+
+
+async function leaveGroup(id){
+
+let ref=db.ref("groups/"+id);
+
+let g=(await ref.once("value")).val();
+
+g.members=
+g.members.filter(x=>x!==me.uid);
+
+if(g.members.length===0){
+
+await ref.remove();
+
+}else{
+
+if(g.admin===me.uid)
+g.admin=g.members[0];
+
+await ref.update({
+members:g.members,
+admin:g.admin
+});
+
+}
+
+document.getElementById("info")?.remove();
+
+showGroups();
+
+}
+
+
+/* =========================
+   ONE TO ONE CALL
+========================= */
+
+const RTC={
+iceServers:[
+{urls:"stun:stun.l.google.com:19302"},
+{urls:"stun:stun1.l.google.com:19302"}
+]
+};
+
+
+async function startCall(uid,type){
+
+try{
+
+let u=(
+await db.ref("users/"+uid).once("value")
+).val();
+
+stream=
+await navigator.mediaDevices.getUserMedia({
+
+audio:true,
+video:type==="video"
+
+});
+
+let id=db.ref("calls").push().key;
+
+call=id;
+
+let pc=
+new RTCPeerConnection(RTC);
+
+stream.getTracks().forEach(
+t=>pc.addTrack(t,stream)
+);
+
+pc.ontrack=e=>{
+if($("remote"))
+$("remote").srcObject=e.streams[0];
+};
+
+pc.onicecandidate=e=>{
+
+if(e.candidate)
+db.ref(
+"calls/"+id+"/ice"
+).push(e.candidate.toJSON());
+
+};
+
+let offer=await pc.createOffer();
+
+await pc.setLocalDescription(offer);
+
+await db.ref("calls/"+id).set({
+
+caller:me.uid,
+receiver:uid,
+type,
+offer:{
+type:offer.type,
+sdp:offer.sdp
+},
+status:"ringing",
+time:Date.now()
+
+});
+
+callScreen(u,type,"Calling...");
+
+}catch(e){
+
+alert(
+"Camera/Microphone permission Allow करें।"
+);
+
+}
+
+}
+
+
+/* GROUP CALL UI */
+
+async function groupCall(id,type){
+
+let g=(
+await db.ref("groups/"+id).once("value")
+).val();
+
+let members=g.members.length;
+
+document.body.insertAdjacentHTML(
+"beforeend",
+
+`
+
+<div class="modal" id="groupCall">
+
+<div class="modalBox">
+
+<h2>
+👥 ${safe(g.name)}
+</h2>
+
+<p>
+${type==="video"?"📹 Group Video Call":"📞 Group Voice Call"}
+</p>
+
+<p>
+Members: ${members}
+</p>
+
+<p class="small">
+Group call room तैयार है।
+</p>
+
+<button
+class="btn blue"
+onclick="joinGroupCall('${id}','${type}')">
+JOIN CALL
+</button>
+
+<button
+class="btn red"
+onclick="document.getElementById('groupCall').remove()">
+CLOSE
+</button>
+
+</div>
+
+</div>
+
+`
+
+);
+
+}
+
+
+/*
+Group call room:
+यह UI और room signaling तैयार करता है।
+Production multi-user calling के लिए
+SFU/RTC server लगाना जरूरी है।
+*/
+
+async function joinGroupCall(id,type){
+
+try{
+
+let media=
+await navigator.mediaDevices
+.getUserMedia({
+
+audio:true,
+video:type==="video"
+
+});
+
+document.getElementById(
+"groupCall"
+)?.remove();
+
+document.body.insertAdjacentHTML(
+"beforeend",
+
+`
+
+<div class="modal" id="activeGroup">
+
+<div class="modalBox">
+
+<h2>👥 Group Call</h2>
+
+<p>
+${type==="video"
+?"📹 Video Call Connected"
+:"📞 Voice Call Connected"}
+</p>
+
+<div id="participants">
+You are in the call.
+</div>
+
+<button
+class="btn red"
+onclick="leaveGroupCall()">
+☎ END CALL
+</button>
+
+</div>
+
+</div>
+`
+
+);
+
+window.groupMedia=media;
+
+}catch(e){
+
+alert(
+"Microphone/Camera permission Allow करें।"
+);
+
+}
+
+}
+
+
+function leaveGroupCall(){
+
+if(window.groupMedia){
+
+window.groupMedia
+.getTracks()
+.forEach(t=>t.stop());
+
+}
+
+document.getElementById(
+"activeGroup"
+)?.remove();
+
+}
+
+
+/* CALL SCREEN */
+
+function callScreen(user,type,status){
+
+document.body.insertAdjacentHTML(
+"beforeend",
+
+`
+
+<div class="modal" id="call">
+
+<div class="modalBox">
+
+${av(user)}
+
+<h2>${safe(user.name)}</h2>
+
+<p>${status}</p>
+
+<video
+id="remote"
+autoplay
+playsinline
+${type==="video"?"":"style='display:none'"}></video>
+
+<button
+class="btn red"
+onclick="endCall()">
+☎ END CALL
+</button>
+
+</div>
+
+</div>
+
+`
+
+);
+
+}
+
+
+function endCall(){
+
+if(stream){
+
+stream.getTracks()
+.forEach(t=>t.stop());
+
+}
+
+document.getElementById(
+"call"
+)?.remove();
+
+call=null;
+
+}
+
+
+/* GLOBAL */
+
+window.home=home;
+window.chat=chat;
+window.profile=profile;
+window.logout=logout;
+window.createGroup=createGroup;
+window.saveGroup=saveGroup;
+window.showGroups=showGroups;
+window.groupChat=groupChat;
+window.groupSend=groupSend;
+window.groupInfo=groupInfo;
+window.leaveGroup=leaveGroup;
+window.startCall=startCall;
+window.groupCall=groupCall;
+window.joinGroupCall=joinGroupCall;
+window.leaveGroupCall=leaveGroupCall;
+window.endCall=endCall;
+
+</script>
+</body>
+</html>
