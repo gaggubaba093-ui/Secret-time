@@ -1,0 +1,1394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>Arslan Ki Duniya</title>
+
+<style>
+*{box-sizing:border-box}
+body{
+ margin:0;
+ font-family:Arial,sans-serif;
+ background:#03141d;
+ color:white;
+}
+button,input{font:inherit}
+button{cursor:pointer}
+.hidden{display:none!important}
+
+#authPage{
+ min-height:100vh;
+ display:flex;
+ justify-content:center;
+ align-items:center;
+ padding:20px;
+}
+.authBox{
+ width:100%;
+ max-width:500px;
+ border:1px solid #13bdf5;
+ border-radius:30px;
+ padding:30px;
+ background:#071e28;
+ box-shadow:0 0 35px #001c29;
+ text-align:center;
+}
+.logo{
+ width:145px;height:145px;
+ margin:auto;
+ border:5px solid #16c6ff;
+ border-radius:50%;
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ font-size:42px;
+}
+.authBox h1{
+ font-size:42px;
+ margin:25px 0 12px;
+}
+.subtitle{
+ color:#9db1ba;
+ font-size:20px;
+ margin-bottom:25px;
+}
+.authBox input{
+ width:100%;
+ padding:18px;
+ margin:8px 0;
+ border-radius:18px;
+ border:1px solid #174d62;
+ background:#04131b;
+ color:white;
+ outline:none;
+}
+.mainBtn{
+ width:100%;
+ padding:18px;
+ border:0;
+ border-radius:18px;
+ background:linear-gradient(90deg,#12bde8,#00d39f);
+ color:white;
+ font-weight:bold;
+ font-size:18px;
+ margin-top:10px;
+}
+.linkBtn{
+ background:none;
+ border:0;
+ color:#16c6ff;
+ margin-top:15px;
+}
+.error{color:#ff7180;margin-top:15px}
+
+#app{
+ min-height:100vh;
+}
+.top{
+ height:125px;
+ background:#071f29;
+ border-bottom:1px solid #17465a;
+ padding:18px;
+ display:flex;
+ align-items:center;
+ gap:15px;
+}
+.avatar{
+ width:72px;height:72px;
+ min-width:72px;
+ border-radius:50%;
+ border:3px solid #16c6ff;
+ background:#092c3b;
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ overflow:hidden;
+ font-size:24px;
+}
+.avatar img{
+ width:100%;
+ height:100%;
+ object-fit:cover;
+}
+.topTitle{
+ flex:1;
+}
+.topTitle h2{
+ margin:0 0 5px;
+ font-size:25px;
+}
+.online{
+ color:#82ff39;
+}
+.logout{
+ width:55px;height:55px;
+ border:1px solid #15536a;
+ border-radius:16px;
+ background:#082532;
+ color:white;
+ font-size:24px;
+}
+
+.search{
+ margin:15px;
+ padding:16px 20px;
+ border-radius:30px;
+ border:1px solid #14536a;
+ background:#04151e;
+ color:white;
+ width:calc(100% - 30px);
+ outline:none;
+}
+
+.stories{
+ display:flex;
+ gap:15px;
+ overflow-x:auto;
+ padding:8px 15px 20px;
+ border-bottom:1px solid #17465a;
+}
+.story{
+ min-width:82px;
+ text-align:center;
+}
+.storyCircle{
+ width:72px;
+ height:72px;
+ margin:auto;
+ border:3px solid #15c6ff;
+ border-radius:50%;
+ overflow:hidden;
+ display:flex;
+ justify-content:center;
+ align-items:center;
+ background:#092d3c;
+ font-size:30px;
+}
+.storyCircle img{
+ width:100%;
+ height:100%;
+ object-fit:cover;
+}
+.storyName{
+ font-size:12px;
+ margin-top:7px;
+ white-space:nowrap;
+ overflow:hidden;
+ text-overflow:ellipsis;
+}
+.addStory{
+ font-size:35px;
+ color:#16c6ff;
+}
+
+.users{
+ padding-bottom:90px;
+}
+.user{
+ display:flex;
+ align-items:center;
+ gap:15px;
+ padding:15px 20px;
+ border-bottom:1px solid #123643;
+}
+.user .avatar{
+ width:62px;height:62px;min-width:62px;
+}
+.userInfo{
+ flex:1;
+}
+.userName{
+ font-size:19px;
+ font-weight:bold;
+}
+.status{
+ color:#899da5;
+ margin-top:4px;
+}
+.status.on{color:#82ff39}
+
+.profile{
+ position:fixed;
+ inset:0;
+ background:#03141d;
+ z-index:50;
+ overflow:auto;
+}
+.profileHead{
+ padding:20px;
+ background:#072532;
+ display:flex;
+ align-items:center;
+ gap:15px;
+}
+.back{
+ background:none;
+ border:0;
+ color:white;
+ font-size:30px;
+}
+.profileBody{
+ text-align:center;
+ padding:35px 20px;
+}
+.bigAvatar{
+ width:150px;height:150px;
+ margin:auto;
+ border-radius:50%;
+ border:4px solid #16c6ff;
+ overflow:hidden;
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ background:#092d3c;
+ font-size:50px;
+}
+.bigAvatar img{
+ width:100%;height:100%;object-fit:cover;
+}
+.fileBtn{
+ display:inline-block;
+ margin-top:20px;
+ padding:13px 20px;
+ border-radius:15px;
+ background:#12bde8;
+ color:white;
+}
+#photoInput,#storyInput{display:none}
+
+#chat{
+ position:fixed;
+ inset:0;
+ background:#03141d;
+ z-index:40;
+ display:none;
+}
+.chatHead{
+ height:85px;
+ padding:10px 15px;
+ background:#072532;
+ border-bottom:1px solid #17465a;
+ display:flex;
+ align-items:center;
+ gap:10px;
+}
+.chatMessages{
+ position:absolute;
+ top:85px;
+ bottom:80px;
+ left:0;
+ right:0;
+ overflow-y:auto;
+ padding:15px;
+}
+.msg{
+ max-width:78%;
+ padding:11px 14px;
+ margin:8px 0;
+ border-radius:18px;
+ word-wrap:break-word;
+}
+.mine{
+ margin-left:auto;
+ background:#075c54;
+ border-bottom-right-radius:5px;
+}
+.theirs{
+ background:#14323e;
+ border-bottom-left-radius:5px;
+}
+.msg img{
+ max-width:230px;
+ max-height:300px;
+ border-radius:12px;
+}
+.time{
+ font-size:10px;
+ opacity:.6;
+ margin-top:4px;
+}
+.chatInput{
+ position:absolute;
+ bottom:0;
+ left:0;
+ right:0;
+ height:80px;
+ background:#061b24;
+ display:flex;
+ align-items:center;
+ gap:7px;
+ padding:10px;
+}
+.chatInput input{
+ flex:1;
+ min-width:0;
+ padding:15px;
+ border-radius:25px;
+ border:1px solid #17566c;
+ background:#03151e;
+ color:white;
+ outline:none;
+}
+.iconBtn{
+ width:52px;height:52px;
+ border:1px solid #16546a;
+ border-radius:50%;
+ background:#072b38;
+ color:white;
+ font-size:22px;
+}
+.send{
+ background:#00cba5;
+ border:0;
+}
+
+.modal{
+ position:fixed;
+ inset:0;
+ background:rgba(0,0,0,.8);
+ z-index:100;
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ padding:20px;
+}
+.modalBox{
+ width:100%;
+ max-width:450px;
+ background:#08232e;
+ border:1px solid #16c6ff;
+ border-radius:25px;
+ padding:25px;
+ text-align:center;
+}
+.storyView{
+ width:100%;
+ max-height:65vh;
+ object-fit:contain;
+ border-radius:18px;
+}
+
+@media(max-width:600px){
+ .authBox h1{font-size:34px}
+ .logo{width:110px;height:110px}
+}
+</style>
+</head>
+
+<body>
+
+<!-- LOGIN / SIGNUP -->
+<section id="authPage">
+<div class="authBox">
+
+<div class="logo">AD</div>
+
+<h1>💬 Arslan Ki Duniya</h1>
+
+<div class="subtitle">Create your account and start chatting</div>
+
+<div id="signupBox">
+
+<input id="signupName" type="text" placeholder="Your Name">
+
+<input id="signupEmail" type="email" placeholder="Email">
+
+<input id="signupPassword" type="password" placeholder="Password">
+
+<button class="mainBtn" id="signupBtn">Create Account</button>
+
+<button class="linkBtn" id="showLogin">
+Already have an account? Login
+</button>
+
+</div>
+
+<div id="loginBox" class="hidden">
+
+<input id="loginEmail" type="email" placeholder="Email">
+
+<input id="loginPassword" type="password" placeholder="Password">
+
+<button class="mainBtn" id="loginBtn">Login</button>
+
+<button class="linkBtn" id="showSignup">
+New user? Sign Up
+</button>
+
+</div>
+
+<div id="authError" class="error"></div>
+
+</div>
+</section>
+
+
+<!-- MAIN APP -->
+<section id="app" class="hidden">
+
+<div class="top">
+
+<div class="avatar" id="myAvatar">AD</div>
+
+<div class="topTitle">
+<h2>Arslan Ki Duniya</h2>
+<div class="online">🟢 Online</div>
+</div>
+
+<button class="logout" id="profileBtn">👤</button>
+
+</div>
+
+<input class="search" id="searchUsers" placeholder="🔎 Search users">
+
+<!-- STORIES -->
+<div class="stories" id="stories">
+
+<div class="story" id="addStory">
+<div class="storyCircle addStory">+</div>
+<div class="storyName">My Story</div>
+</div>
+
+</div>
+
+<!-- USERS -->
+<div class="users" id="users"></div>
+
+</section>
+
+
+<!-- PROFILE -->
+<section id="profile" class="profile hidden">
+
+<div class="profileHead">
+
+<button class="back" id="closeProfile">‹</button>
+
+<h2>My Profile</h2>
+
+</div>
+
+<div class="profileBody">
+
+<div class="bigAvatar" id="profileAvatar">AD</div>
+
+<h2 id="profileName">User</h2>
+
+<p id="profileEmail"></p>
+
+<label class="fileBtn">
+📷 Change Profile Photo
+<input id="photoInput" type="file" accept="image/*">
+</label>
+
+<p style="color:#8da4ad;margin-top:25px">
+Your profile photo is saved in Firebase.
+</p>
+
+</div>
+
+</section>
+
+
+<!-- CHAT -->
+<section id="chat">
+
+<div class="chatHead">
+
+<button class="back" id="closeChat">‹</button>
+
+<div class="avatar" id="chatAvatar">U</div>
+
+<div class="topTitle">
+<h2 id="chatName">User</h2>
+<div id="chatStatus" class="status">Offline</div>
+</div>
+
+</div>
+
+<div class="chatMessages" id="chatMessages"></div>
+
+<div class="chatInput">
+
+<button class="iconBtn" id="imageBtn">📷</button>
+
+<input type="file" id="imageInput" accept="image/*" hidden>
+
+<button class="iconBtn" id="micBtn">🎤</button>
+
+<input id="messageInput" placeholder="Message...">
+
+<button class="iconBtn send" id="sendBtn">➤</button>
+
+</div>
+
+</section>
+
+
+<!-- STORY VIEW -->
+<div id="storyModal" class="modal hidden">
+
+<div class="modalBox">
+
+<button class="back" id="closeStory">×</button>
+
+<img id="storyImage" class="storyView">
+
+<h3 id="storyOwner"></h3>
+
+</div>
+
+</div>
+
+
+<!-- STORY UPLOAD -->
+<input type="file" id="storyInput" accept="image/*" hidden>
+
+
+<script type="module">
+
+import {
+ initializeApp
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
+
+import {
+ getAuth,
+ createUserWithEmailAndPassword,
+ signInWithEmailAndPassword,
+ onAuthStateChanged,
+ signOut
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
+
+import {
+ getDatabase,
+ ref,
+ set,
+ get,
+ update,
+ push,
+ onValue,
+ onDisconnect
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-database.js";
+
+
+/* =========================
+   FIREBASE CONFIG
+========================= */
+
+const firebaseConfig = {
+ apiKey:"AIzaSyB7B00ndag8PE78pjLxFg4iok9-9_U5bz0",
+ authDomain:"secret-frame-698ba.firebaseapp.com",
+ databaseURL:"https://secret-frame-698ba-default-rtdb.asia-southeast1.firebasedatabase.app",
+ projectId:"secret-frame-698ba",
+ storageBucket:"secret-frame-698ba.firebasestorage.app",
+ messagingSenderId:"601470862803",
+ appId:"1:601470862803:web:3b666e06133804609b9b26",
+ measurementId:"G-ZJFBPLLZZJ"
+};
+
+const appFirebase = initializeApp(firebaseConfig);
+const auth = getAuth(appFirebase);
+const db = getDatabase(appFirebase);
+
+
+/* =========================
+   ELEMENTS
+========================= */
+
+const authPage=document.getElementById("authPage");
+const appPage=document.getElementById("app");
+
+const signupBox=document.getElementById("signupBox");
+const loginBox=document.getElementById("loginBox");
+
+const authError=document.getElementById("authError");
+
+const signupName=document.getElementById("signupName");
+const signupEmail=document.getElementById("signupEmail");
+const signupPassword=document.getElementById("signupPassword");
+
+const loginEmail=document.getElementById("loginEmail");
+const loginPassword=document.getElementById("loginPassword");
+
+const usersBox=document.getElementById("users");
+const storiesBox=document.getElementById("stories");
+
+let currentUser=null;
+let myProfile=null;
+let selectedUser=null;
+
+
+/* =========================
+   UTILITIES
+========================= */
+
+function esc(text){
+ return String(text||"")
+ .replaceAll("&","&amp;")
+ .replaceAll("<","&lt;")
+ .replaceAll(">","&gt;")
+ .replaceAll('"',"&quot;");
+}
+
+function initials(name){
+ return (name||"U")
+ .trim()
+ .split(/\s+/)
+ .slice(0,2)
+ .map(x=>x[0])
+ .join("")
+ .toUpperCase();
+}
+
+function fileToBase64(file){
+ return new Promise((resolve,reject)=>{
+   const reader=new FileReader();
+   reader.onload=()=>resolve(reader.result);
+   reader.onerror=reject;
+   reader.readAsDataURL(file);
+ });
+}
+
+function showError(msg){
+ authError.textContent=msg;
+}
+
+
+/* =========================
+   AUTH SWITCH
+========================= */
+
+document.getElementById("showLogin").onclick=()=>{
+ signupBox.classList.add("hidden");
+ loginBox.classList.remove("hidden");
+ showError("");
+};
+
+document.getElementById("showSignup").onclick=()=>{
+ loginBox.classList.add("hidden");
+ signupBox.classList.remove("hidden");
+ showError("");
+};
+
+
+/* =========================
+   SIGNUP
+========================= */
+
+document.getElementById("signupBtn").onclick=async()=>{
+
+ const name=signupName.value.trim();
+ const email=signupEmail.value.trim();
+ const password=signupPassword.value;
+
+ if(!name){
+   showError("Please enter your name.");
+   return;
+ }
+
+ if(!email){
+   showError("Please enter your email.");
+   return;
+ }
+
+ if(password.length<6){
+   showError("Password must be at least 6 characters.");
+   return;
+ }
+
+ try{
+
+   const result=await createUserWithEmailAndPassword(
+     auth,email,password
+   );
+
+   const uid=result.user.uid;
+
+   await set(ref(db,"users/"+uid),{
+     uid:uid,
+     name:name,
+     email:email,
+     photo:"",
+     online:true,
+     lastSeen:Date.now(),
+     createdAt:Date.now()
+   });
+
+ }catch(error){
+
+   console.error(error);
+   showError(error.message);
+
+ }
+
+};
+
+
+/* =========================
+   LOGIN
+========================= */
+
+document.getElementById("loginBtn").onclick=async()=>{
+
+ const email=loginEmail.value.trim();
+ const password=loginPassword.value;
+
+ if(!email||!password){
+   showError("Enter email and password.");
+   return;
+ }
+
+ try{
+
+   await signInWithEmailAndPassword(
+     auth,email,password
+   );
+
+ }catch(error){
+
+   console.error(error);
+   showError(error.message);
+
+ }
+
+};
+
+
+/* =========================
+   AUTH STATE
+========================= */
+
+onAuthStateChanged(auth,async(user)=>{
+
+ if(user){
+
+   currentUser=user;
+
+   authPage.classList.add("hidden");
+   appPage.classList.remove("hidden");
+
+   await loadMyProfile();
+
+   setOnline();
+
+   listenUsers();
+
+   listenStories();
+
+ }else{
+
+   currentUser=null;
+
+   authPage.classList.remove("hidden");
+   appPage.classList.add("hidden");
+
+ }
+
+});
+
+
+/* =========================
+   MY PROFILE
+========================= */
+
+async function loadMyProfile(){
+
+ const snap=await get(
+   ref(db,"users/"+currentUser.uid)
+ );
+
+ if(snap.exists()){
+
+   myProfile=snap.val();
+
+ }else{
+
+   myProfile={
+     uid:currentUser.uid,
+     name:currentUser.email.split("@")[0],
+     email:currentUser.email,
+     photo:""
+   };
+
+   await set(
+     ref(db,"users/"+currentUser.uid),
+     myProfile
+   );
+
+ }
+
+ updateMyAvatar();
+
+}
+
+function updateMyAvatar(){
+
+ const avatar=document.getElementById("myAvatar");
+
+ if(myProfile.photo){
+
+   avatar.innerHTML=
+   `<img src="${myProfile.photo}">`;
+
+ }else{
+
+   avatar.textContent=
+   initials(myProfile.name);
+
+ }
+
+}
+
+
+/* =========================
+   ONLINE STATUS
+========================= */
+
+function setOnline(){
+
+ const userRef=ref(
+   db,"users/"+currentUser.uid
+ );
+
+ update(userRef,{
+   online:true,
+   lastSeen:Date.now()
+ });
+
+ onDisconnect(userRef).update({
+   online:false,
+   lastSeen:Date.now()
+ });
+
+}
+
+
+/* =========================
+   USERS LIST
+========================= */
+
+let allUsers=[];
+
+function listenUsers(){
+
+ onValue(ref(db,"users"),snap=>{
+
+   allUsers=[];
+
+   if(snap.exists()){
+
+     snap.forEach(child=>{
+
+       const u=child.val();
+
+       if(u.uid!==currentUser.uid){
+         allUsers.push(u);
+       }
+
+     });
+
+   }
+
+   renderUsers();
+
+ });
+
+}
+
+function renderUsers(){
+
+ const query=
+ document.getElementById("searchUsers").value
+ .trim().toLowerCase();
+
+ usersBox.innerHTML="";
+
+ allUsers
+ .filter(u=>
+   !query ||
+   (u.name||"").toLowerCase().includes(query) ||
+   (u.email||"").toLowerCase().includes(query)
+ )
+ .forEach(u=>{
+
+   const row=document.createElement("div");
+   row.className="user";
+
+   const avatar=u.photo
+   ? `<img src="${u.photo}">`
+   : esc(initials(u.name));
+
+   row.innerHTML=`
+
+   <div class="avatar">${avatar}</div>
+
+   <div class="userInfo">
+
+     <div class="userName">
+       ${esc(u.name||"User")}
+     </div>
+
+     <div class="status ${u.online?"on":""}">
+       ${u.online?"🟢 Online":"⚫ Offline"}
+     </div>
+
+   </div>
+
+   <div>›</div>
+
+   `;
+
+   row.onclick=()=>openChat(u);
+
+   usersBox.appendChild(row);
+
+ });
+
+}
+
+document.getElementById("searchUsers")
+.addEventListener("input",renderUsers);
+
+
+/* =========================
+   CHAT
+========================= */
+
+function chatId(a,b){
+
+ return [a,b].sort().join("_");
+
+}
+
+function openChat(user){
+
+ selectedUser=user;
+
+ document.getElementById("chat")
+ .style.display="block";
+
+ document.getElementById("chatName")
+ .textContent=user.name||"User";
+
+ document.getElementById("chatStatus")
+ .textContent=user.online
+ ?"🟢 Online"
+ :"⚫ Offline";
+
+ const av=document.getElementById("chatAvatar");
+
+ if(user.photo){
+
+   av.innerHTML=`<img src="${user.photo}">`;
+
+ }else{
+
+   av.textContent=initials(user.name);
+
+ }
+
+ listenMessages();
+
+}
+
+function listenMessages(){
+
+ if(!selectedUser)return;
+
+ const id=chatId(
+   currentUser.uid,
+   selectedUser.uid
+ );
+
+ onValue(
+   ref(db,"messages/"+id),
+   snap=>{
+
+     const box=document.getElementById("chatMessages");
+
+     box.innerHTML="";
+
+     if(!snap.exists())return;
+
+     snap.forEach(child=>{
+
+       const m=child.val();
+
+       const div=document.createElement("div");
+
+       div.className=
+       "msg "+
+       (m.sender===currentUser.uid
+       ?"mine"
+       :"theirs");
+
+       let content="";
+
+       if(m.text){
+         content+=`<div>${esc(m.text)}</div>`;
+       }
+
+       if(m.image){
+         content+=
+         `<img src="${m.image}">`;
+       }
+
+       content+=
+       `<div class="time">
+       ${new Date(m.time||Date.now())
+       .toLocaleTimeString([],{
+         hour:"2-digit",
+         minute:"2-digit"
+       })}
+       </div>`;
+
+       div.innerHTML=content;
+
+       box.appendChild(div);
+
+     });
+
+     box.scrollTop=box.scrollHeight;
+
+   }
+ );
+
+}
+
+
+/* =========================
+   SEND MESSAGE
+========================= */
+
+async function sendMessage(){
+
+ if(!selectedUser)return;
+
+ const input=
+ document.getElementById("messageInput");
+
+ const text=input.value.trim();
+
+ if(!text)return;
+
+ const id=chatId(
+   currentUser.uid,
+   selectedUser.uid
+ );
+
+ const messageRef=
+ push(ref(db,"messages/"+id));
+
+ await set(messageRef,{
+   sender:currentUser.uid,
+   receiver:selectedUser.uid,
+   text:text,
+   image:"",
+   time:Date.now()
+ });
+
+ input.value="";
+
+}
+
+document.getElementById("sendBtn")
+.onclick=sendMessage;
+
+document.getElementById("messageInput")
+.addEventListener("keydown",e=>{
+
+ if(e.key==="Enter"){
+   sendMessage();
+ }
+
+});
+
+
+/* =========================
+   IMAGE MESSAGE
+========================= */
+
+document.getElementById("imageBtn").onclick=()=>{
+ document.getElementById("imageInput").click();
+};
+
+document.getElementById("imageInput")
+.addEventListener("change",async e=>{
+
+ const file=e.target.files[0];
+
+ if(!file||!selectedUser)return;
+
+ if(file.size>2*1024*1024){
+
+   alert("Image must be below 2 MB.");
+   return;
+
+ }
+
+ const base64=await fileToBase64(file);
+
+ const id=chatId(
+   currentUser.uid,
+   selectedUser.uid
+ );
+
+ const messageRef=
+ push(ref(db,"messages/"+id));
+
+ await set(messageRef,{
+   sender:currentUser.uid,
+   receiver:selectedUser.uid,
+   text:"",
+   image:base64,
+   time:Date.now()
+ });
+
+ e.target.value="";
+
+});
+
+
+/* =========================
+   CLOSE CHAT
+========================= */
+
+document.getElementById("closeChat").onclick=()=>{
+ document.getElementById("chat").style.display="none";
+ selectedUser=null;
+};
+
+
+/* =========================
+   PROFILE
+========================= */
+
+document.getElementById("profileBtn").onclick=()=>{
+
+ document.getElementById("profile")
+ .classList.remove("hidden");
+
+ document.getElementById("profileName")
+ .textContent=myProfile.name||"User";
+
+ document.getElementById("profileEmail")
+ .textContent=myProfile.email||"";
+
+ const av=document.getElementById("profileAvatar");
+
+ if(myProfile.photo){
+
+   av.innerHTML=
+   `<img src="${myProfile.photo}">`;
+
+ }else{
+
+   av.textContent=initials(myProfile.name);
+
+ }
+
+};
+
+document.getElementById("closeProfile").onclick=()=>{
+ document.getElementById("profile")
+ .classList.add("hidden");
+};
+
+
+/* =========================
+   PROFILE PHOTO
+========================= */
+
+document.getElementById("photoInput")
+.addEventListener("change",async e=>{
+
+ const file=e.target.files[0];
+
+ if(!file)return;
+
+ if(file.size>2*1024*1024){
+
+   alert("Photo must be below 2 MB.");
+   return;
+
+ }
+
+ const photo=await fileToBase64(file);
+
+ await update(
+   ref(db,"users/"+currentUser.uid),
+   {photo:photo}
+ );
+
+ myProfile.photo=photo;
+
+ updateMyAvatar();
+
+ document.getElementById("profileAvatar")
+ .innerHTML=`<img src="${photo}">`;
+
+ alert("Profile photo updated!");
+
+ e.target.value="";
+
+});
+
+
+/* =========================
+   STORIES
+========================= */
+
+document.getElementById("addStory").onclick=()=>{
+ document.getElementById("storyInput").click();
+};
+
+document.getElementById("storyInput")
+.addEventListener("change",async e=>{
+
+ const file=e.target.files[0];
+
+ if(!file)return;
+
+ if(file.size>2*1024*1024){
+
+   alert("Story image must be below 2 MB.");
+   return;
+
+ }
+
+ const image=await fileToBase64(file);
+
+ const storyRef=push(ref(db,"stories"));
+
+ await set(storyRef,{
+   uid:currentUser.uid,
+   name:myProfile.name,
+   photo:image,
+   createdAt:Date.now()
+ });
+
+ e.target.value="";
+
+});
+
+
+function listenStories(){
+
+ onValue(ref(db,"stories"),snap=>{
+
+   while(storiesBox.children.length>1){
+     storiesBox.removeChild(storiesBox.lastChild);
+   }
+
+   if(!snap.exists())return;
+
+   const now=Date.now();
+
+   snap.forEach(child=>{
+
+     const s=child.val();
+
+     // 24 hour story
+     if(now-s.createdAt>24*60*60*1000){
+       return;
+     }
+
+     const story=document.createElement("div");
+     story.className="story";
+
+     story.innerHTML=`
+
+     <div class="storyCircle">
+
+       <img src="${s.photo}">
+
+     </div>
+
+     <div class="storyName">
+       ${esc(s.name)}
+     </div>
+
+     `;
+
+     story.onclick=()=>{
+
+       document.getElementById("storyModal")
+       .classList.remove("hidden");
+
+       document.getElementById("storyImage")
+       .src=s.photo;
+
+       document.getElementById("storyOwner")
+       .textContent=s.name;
+
+     };
+
+     storiesBox.appendChild(story);
+
+   });
+
+ });
+
+}
+
+
+/* =========================
+   CLOSE STORY
+========================= */
+
+document.getElementById("closeStory").onclick=()=>{
+ document.getElementById("storyModal")
+ .classList.add("hidden");
+};
+
+
+/* =========================
+   MICROPHONE
+========================= */
+
+document.getElementById("micBtn").onclick=()=>{
+
+ if(!navigator.mediaDevices||
+    !navigator.mediaDevices.getUserMedia){
+
+   alert("Microphone is not supported.");
+   return;
+
+ }
+
+ navigator.mediaDevices
+ .getUserMedia({audio:true})
+ .then(stream=>{
+
+   alert("🎤 Microphone permission is active.");
+
+   stream.getTracks().forEach(
+     track=>track.stop()
+   );
+
+ })
+ .catch(()=>{
+
+   alert("Microphone permission denied.");
+
+ });
+
+};
+
+
+/* =========================
+   LOGOUT
+========================= */
+
+document.getElementById("logout")
+?.addEventListener("click",async()=>{
+
+ await signOut(auth);
+
+});
+
+</script>
+
+</body>
+</html>
