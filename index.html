@@ -1,0 +1,2312 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Arslan Ki Duniya</title>
+
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#03151e;color:#fff;font-family:Arial,sans-serif}
+button,input{font:inherit}
+button{cursor:pointer}
+.hidden{display:none!important}
+
+.auth{
+min-height:100vh;
+display:flex;
+align-items:center;
+justify-content:center;
+padding:20px
+}
+
+.authBox{
+width:100%;
+max-width:430px;
+background:#072631;
+border:1px solid #15c8ff;
+border-radius:25px;
+padding:25px;
+box-shadow:0 0 30px #00bfff33
+}
+
+.logo{
+width:90px;
+height:90px;
+border:4px solid #15c8ff;
+border-radius:50%;
+display:flex;
+align-items:center;
+justify-content:center;
+margin:auto;
+font-size:28px
+}
+
+h1{text-align:center}
+.sub{text-align:center;color:#9eb5bd}
+
+input{
+width:100%;
+padding:15px;
+margin:7px 0;
+border:1px solid #285666;
+border-radius:14px;
+background:#031820;
+color:#fff;
+outline:none
+}
+
+input:focus{border-color:#15c8ff}
+
+.mainBtn{
+width:100%;
+padding:15px;
+border:0;
+border-radius:14px;
+margin-top:8px;
+background:linear-gradient(90deg,#12bfea,#08d1a3);
+color:white;
+font-weight:bold
+}
+
+.link{
+background:none;
+border:0;
+color:#16c7ff;
+padding:12px
+}
+
+.error{
+color:#ff6f7c;
+text-align:center;
+margin-top:10px
+}
+
+.center{text-align:center}
+
+.top{
+height:75px;
+background:#072631;
+border-bottom:1px solid #164b5a;
+display:flex;
+align-items:center;
+gap:9px;
+padding:10px 13px;
+position:sticky;
+top:0;
+z-index:10
+}
+
+.title{
+flex:1;
+font-size:19px;
+font-weight:bold
+}
+
+.avatar{
+width:52px;
+height:52px;
+min-width:52px;
+border-radius:50%;
+border:3px solid #15c8ff;
+background:#0b3542;
+display:flex;
+align-items:center;
+justify-content:center;
+overflow:hidden;
+font-size:20px
+}
+
+.avatar img{
+width:100%;
+height:100%;
+object-fit:cover
+}
+
+.icon{
+width:45px;
+height:45px;
+border:0;
+border-radius:50%;
+background:#0b3a48;
+color:white
+}
+
+.callBtn{background:#078e76}
+.endBtn{background:#e5485b}
+
+.search{
+margin:15px;
+width:calc(100% - 30px)
+}
+
+.user{
+display:flex;
+align-items:center;
+gap:12px;
+padding:13px 15px;
+border-bottom:1px solid #103743
+}
+
+.userInfo{flex:1}
+
+.userName{
+font-size:18px;
+font-weight:bold
+}
+
+.status{color:#899da5}
+.online{color:#4be39b}
+
+.chat{
+height:100vh;
+display:flex;
+flex-direction:column
+}
+
+.messages{
+flex:1;
+overflow-y:auto;
+padding:15px
+}
+
+.msg{
+max-width:82%;
+margin:7px 0;
+padding:11px 14px;
+border-radius:17px;
+background:#12333e;
+word-break:break-word
+}
+
+.mine{
+margin-left:auto;
+background:#087263
+}
+
+.msg img{
+max-width:240px;
+border-radius:12px
+}
+
+.msg audio{
+max-width:230px
+}
+
+.compose{
+display:flex;
+align-items:center;
+gap:6px;
+padding:8px;
+background:#06242d
+}
+
+.compose input{
+flex:1;
+margin:0
+}
+
+.profile{
+padding:25px;
+max-width:500px;
+margin:auto
+}
+
+.modal{
+position:fixed;
+inset:0;
+z-index:100;
+background:#000c;
+display:flex;
+align-items:center;
+justify-content:center;
+padding:20px
+}
+
+.modalBox{
+width:100%;
+max-width:430px;
+background:#072631;
+border:1px solid #15c8ff;
+border-radius:25px;
+padding:25px;
+text-align:center
+}
+
+video{
+width:100%;
+background:#000;
+border-radius:15px;
+margin-top:10px
+}
+
+.row{
+display:flex;
+justify-content:center;
+gap:15px;
+margin-top:15px
+}
+</style>
+</head>
+
+<body>
+
+<div id="app"></div>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage-compat.js"></script>
+
+<script>
+
+/* =========================
+   FIREBASE
+========================= */
+
+const firebaseConfig={
+
+apiKey:
+"AIzaSyB7B00ndag8PE78pjLxFg4iok9-9_U5bz0",
+
+authDomain:
+"secret-frame-698ba.firebaseapp.com",
+
+databaseURL:
+"https://secret-frame-698ba-default-rtdb.asia-southeast1.firebasedatabase.app",
+
+projectId:
+"secret-frame-698ba",
+
+storageBucket:
+"secret-frame-698ba.firebasestorage.app",
+
+messagingSenderId:
+"601470862803",
+
+appId:
+"1:601470862803:web:3b666e06133804609b9b26",
+
+measurementId:
+"G-ZJFBPLLZZJ"
+
+};
+
+firebase.initializeApp(firebaseConfig);
+
+const auth=firebase.auth();
+const db=firebase.database();
+const storage=firebase.storage();
+
+let currentUser=null;
+let selectedUser=null;
+
+let rtc=null;
+let localStream=null;
+let currentCallId=null;
+
+
+/* =========================
+   HELPERS
+========================= */
+
+function $(id){
+return document.getElementById(id);
+}
+
+function esc(x){
+
+return String(x??"")
+.replace(/[&<>"']/g,c=>({
+
+"&":"&amp;",
+"<":"&lt;",
+">":"&gt;",
+'"':"&quot;",
+"'":"&#039;"
+
+}[c]));
+
+}
+
+function initials(name){
+
+return String(name||"U")
+.trim()
+.split(/\s+/)
+.slice(0,2)
+.map(x=>x[0])
+.join("")
+.toUpperCase()||"U";
+
+}
+
+function avatar(user){
+
+if(user&&user.photo){
+
+return `
+<div class="avatar">
+<img src="${esc(user.photo)}">
+</div>
+`;
+
+}
+
+return `
+<div class="avatar">
+${initials(user?.name)}
+</div>
+`;
+
+}
+
+function chatId(a,b){
+
+return [a,b].sort().join("_");
+
+}
+
+
+/* =========================
+   LOGIN / SIGNUP
+========================= */
+
+function showAuth(signup=false){
+
+$("app").innerHTML=`
+
+<div class="auth">
+
+<div class="authBox">
+
+<div class="logo">
+AD
+</div>
+
+<h1>
+💬 Arslan Ki Duniya
+</h1>
+
+<p class="sub">
+${signup
+?"Create your account"
+:"Login to your account"}
+</p>
+
+<div id="authError"
+class="error">
+</div>
+
+${
+signup
+?
+`
+<input
+id="signupName"
+placeholder="Your Name">
+`
+:
+""
+}
+
+<input
+id="authEmail"
+type="email"
+placeholder="Email">
+
+<input
+id="authPassword"
+type="password"
+placeholder="Password">
+
+<button
+class="mainBtn"
+id="authButton">
+
+${signup
+?"Sign Up"
+:"Login"}
+
+</button>
+
+<div class="center">
+
+<button
+class="link"
+id="changeAuth">
+
+${
+signup
+?
+"Already have account? Login"
+:
+"New user? Sign Up"
+}
+
+</button>
+
+</div>
+
+</div>
+</div>
+`;
+
+
+$("changeAuth").onclick=()=>{
+
+showAuth(!signup);
+
+};
+
+
+$("authButton").onclick=async()=>{
+
+try{
+
+const email=
+$("authEmail").value.trim();
+
+const password=
+$("authPassword").value;
+
+
+if(!email){
+
+throw Error(
+"Email डालें।"
+);
+
+}
+
+
+if(password.length<6){
+
+throw Error(
+"Password कम से कम 6 characters रखें।"
+);
+
+}
+
+
+if(signup){
+
+const name=
+$("signupName").value.trim();
+
+if(!name){
+
+throw Error(
+"अपना नाम डालें।"
+);
+
+}
+
+
+const result=
+await auth.createUserWithEmailAndPassword(
+email,
+password
+);
+
+
+await result.user.updateProfile({
+
+displayName:name
+
+});
+
+
+await db.ref(
+"users/"+result.user.uid
+).set({
+
+uid:result.user.uid,
+
+name:name,
+
+email:email,
+
+photo:"",
+
+online:true,
+
+lastSeen:
+firebase.database.ServerValue.TIMESTAMP
+
+});
+
+
+}else{
+
+
+await auth.signInWithEmailAndPassword(
+email,
+password
+);
+
+
+}
+
+
+}catch(error){
+
+$("authError").textContent=
+error.message;
+
+}
+
+};
+
+}
+
+
+/* =========================
+   AUTH STATE
+========================= */
+
+auth.onAuthStateChanged(
+async user=>{
+
+if(!user){
+
+currentUser=null;
+
+showAuth(false);
+
+return;
+
+}
+
+
+currentUser=user;
+
+
+await db.ref(
+"users/"+user.uid
+).update({
+
+name:
+user.displayName||
+user.email.split("@")[0],
+
+email:user.email,
+
+online:true,
+
+lastSeen:
+firebase.database.ServerValue.TIMESTAMP
+
+});
+
+
+db.ref(
+"users/"+user.uid
+)
+.onDisconnect()
+.update({
+
+online:false,
+
+lastSeen:
+firebase.database.ServerValue.TIMESTAMP
+
+});
+
+
+watchIncomingCalls();
+
+showHome();
+
+});
+
+
+/* =========================
+   HOME
+========================= */
+
+async function showHome(){
+
+const snap=
+await db.ref(
+"users/"+currentUser.uid
+).once("value");
+
+const me=
+snap.val()||{};
+
+
+$("app").innerHTML=`
+
+<div class="top">
+
+${avatar(me)}
+
+<div class="title">
+Arslan Ki Duniya
+</div>
+
+<button
+class="icon"
+id="profile">
+👤
+</button>
+
+<button
+class="icon"
+id="logout">
+↪
+</button>
+
+</div>
+
+
+<input
+class="search"
+id="search"
+placeholder="🔎 Search users">
+
+
+<div id="users">
+</div>
+
+`;
+
+
+$("profile").onclick=
+showProfile;
+
+$("logout").onclick=
+logout;
+
+$("search").oninput=
+loadUsers;
+
+loadUsers();
+
+}
+
+
+/* =========================
+   USERS
+========================= */
+
+async function loadUsers(){
+
+const search=
+$("search")?.value
+.trim()
+.toLowerCase()||"";
+
+
+const snap=
+await db.ref("users")
+.once("value");
+
+
+let html="";
+
+
+snap.forEach(child=>{
+
+const user=child.val();
+
+
+if(!user)
+return;
+
+
+if(user.uid===currentUser.uid)
+return;
+
+
+if(
+search &&
+!String(user.name||"")
+.toLowerCase()
+.includes(search)
+)
+return;
+
+
+html+=`
+
+<div class="user">
+
+${avatar(user)}
+
+<div
+class="userInfo"
+onclick="openChat('${user.uid}')">
+
+<div class="userName">
+${esc(user.name)}
+</div>
+
+<div class="${
+user.online
+?"online"
+:"status"
+}">
+
+${
+user.online
+?"🟢 Online"
+:"⚫ Offline"
+}
+
+</div>
+
+</div>
+
+
+<button
+class="icon callBtn"
+onclick="startCall(
+'${user.uid}',
+'audio'
+)">
+
+📞
+
+</button>
+
+
+<button
+class="icon"
+onclick="startCall(
+'${user.uid}',
+'video'
+)">
+
+📹
+
+</button>
+
+</div>
+
+`;
+
+});
+
+
+$("users").innerHTML=
+html||
+
+`
+<p class="center sub">
+कोई दूसरा user नहीं मिला।
+</p>
+`;
+
+}
+
+
+/* =========================
+   CHAT
+========================= */
+
+async function openChat(uid){
+
+const snap=
+await db.ref(
+"users/"+uid
+).once("value");
+
+
+selectedUser=
+snap.val();
+
+
+const id=
+chatId(
+currentUser.uid,
+uid
+);
+
+
+$("app").innerHTML=`
+
+<div class="chat">
+
+
+<div class="top">
+
+<button
+class="link"
+id="back">
+←
+</button>
+
+
+${avatar(selectedUser)}
+
+
+<div class="title">
+${esc(selectedUser.name)}
+</div>
+
+
+<button
+class="icon callBtn"
+id="audioCall">
+📞
+</button>
+
+
+<button
+class="icon"
+id="videoCall">
+📹
+</button>
+
+
+</div>
+
+
+<div
+class="messages"
+id="messages">
+</div>
+
+
+<div class="compose">
+
+
+<button
+class="icon"
+id="image">
+📷
+</button>
+
+
+<button
+class="icon"
+id="voice">
+🎙️
+</button>
+
+
+<input
+id="message"
+placeholder="Message...">
+
+
+<button
+class="icon callBtn"
+id="send">
+➤
+</button>
+
+
+</div>
+
+
+</div>
+
+`;
+
+
+$("back").onclick=
+showHome;
+
+
+$("audioCall").onclick=
+()=>startCall(
+uid,
+"audio"
+);
+
+
+$("videoCall").onclick=
+()=>startCall(
+uid,
+"video"
+);
+
+
+$("send").onclick=
+sendMessage;
+
+
+$("image").onclick=
+sendImage;
+
+
+$("voice").onclick=
+recordVoice;
+
+
+$("message").onkeydown=
+event=>{
+
+if(event.key==="Enter"){
+
+sendMessage();
+
+}
+
+};
+
+
+db.ref(
+"chats/"+
+id+
+"/messages"
+)
+.limitToLast(100)
+.on(
+"value",
+renderMessages
+);
+
+}
+
+
+/* =========================
+   RENDER MESSAGES
+========================= */
+
+function renderMessages(snapshot){
+
+const box=$("messages");
+
+if(!box)
+return;
+
+
+box.innerHTML="";
+
+
+snapshot.forEach(child=>{
+
+const message=
+child.val();
+
+
+const div=
+document.createElement("div");
+
+
+div.className=
+"msg "+
+(
+message.from===currentUser.uid
+?"mine"
+:""
+);
+
+
+if(
+message.type==="image"
+){
+
+div.innerHTML=`
+
+<img
+src="${esc(message.url)}">
+
+`;
+
+}else if(
+message.type==="audio"
+){
+
+div.innerHTML=`
+
+<audio
+controls
+src="${esc(message.url)}">
+</audio>
+
+`;
+
+}else{
+
+div.textContent=
+message.text||"";
+
+}
+
+
+box.appendChild(div);
+
+});
+
+
+box.scrollTop=
+box.scrollHeight;
+
+}
+
+
+/* =========================
+   SEND MESSAGE
+========================= */
+
+async function sendMessage(){
+
+const input=
+$("message");
+
+const text=
+input.value.trim();
+
+
+if(!text)
+return;
+
+
+input.value="";
+
+
+await db.ref(
+
+"chats/"+
+chatId(
+currentUser.uid,
+selectedUser.uid
+)+
+"/messages"
+
+).push({
+
+from:currentUser.uid,
+
+to:selectedUser.uid,
+
+type:"text",
+
+text:text,
+
+time:
+firebase.database.ServerValue.TIMESTAMP
+
+});
+
+}
+
+
+/* =========================
+   SEND IMAGE
+========================= */
+
+async function sendImage(){
+
+const input=
+document.createElement("input");
+
+input.type="file";
+
+input.accept="image/*";
+
+
+input.onchange=
+async()=>{
+
+const file=
+input.files[0];
+
+
+if(!file)
+return;
+
+
+try{
+
+const ref=
+storage.ref(
+
+"chat/"+
+chatId(
+currentUser.uid,
+selectedUser.uid
+)+
+"/"+
+Date.now()+
+"_"+file.name
+
+);
+
+
+await ref.put(file);
+
+
+const url=
+await ref.getDownloadURL();
+
+
+await db.ref(
+
+"chats/"+
+chatId(
+currentUser.uid,
+selectedUser.uid
+)+
+"/messages"
+
+).push({
+
+from:currentUser.uid,
+
+to:selectedUser.uid,
+
+type:"image",
+
+url:url,
+
+time:Date.now()
+
+});
+
+
+}catch(error){
+
+alert(error.message);
+
+}
+
+};
+
+
+input.click();
+
+}
+
+
+/* =========================
+   VOICE MESSAGE
+========================= */
+
+async function recordVoice(){
+
+try{
+
+const stream=
+await navigator.mediaDevices
+.getUserMedia({
+audio:true
+});
+
+
+const recorder=
+new MediaRecorder(stream);
+
+
+const chunks=[];
+
+
+recorder.ondataavailable=
+event=>{
+
+if(event.data.size){
+
+chunks.push(
+event.data
+);
+
+}
+
+};
+
+
+recorder.onstop=
+async()=>{
+
+stream
+.getTracks()
+.forEach(
+track=>track.stop()
+);
+
+
+const blob=
+new Blob(
+chunks,
+{
+type:"audio/webm"
+}
+);
+
+
+const ref=
+storage.ref(
+
+"voice/"+
+chatId(
+currentUser.uid,
+selectedUser.uid
+)+
+"/"+
+Date.now()+
+".webm"
+
+);
+
+
+await ref.put(blob);
+
+
+const url=
+await ref.getDownloadURL();
+
+
+await db.ref(
+
+"chats/"+
+chatId(
+currentUser.uid,
+selectedUser.uid
+)+
+"/messages"
+
+).push({
+
+from:currentUser.uid,
+
+to:selectedUser.uid,
+
+type:"audio",
+
+url:url,
+
+time:Date.now()
+
+});
+
+};
+
+
+recorder.start();
+
+
+alert(
+"5 सेकंड की voice recording शुरू है।"
+);
+
+
+setTimeout(()=>{
+
+if(
+recorder.state==="recording"
+){
+
+recorder.stop();
+
+}
+
+},5000);
+
+
+}catch(error){
+
+alert(
+"Microphone permission Allow करें।"
+);
+
+}
+
+}
+
+
+/* =========================
+   PROFILE
+========================= */
+
+async function showProfile(){
+
+const snap=
+await db.ref(
+"users/"+currentUser.uid
+).once("value");
+
+
+const user=
+snap.val()||{};
+
+
+$("app").innerHTML=`
+
+<div class="profile">
+
+
+<button
+class="link"
+onclick="showHome()">
+
+← Back
+
+</button>
+
+
+<div class="center">
+
+${avatar(user)}
+
+
+<h2>
+${esc(user.name)}
+</h2>
+
+
+<p class="sub">
+${esc(user.email)}
+</p>
+
+</div>
+
+
+<input
+id="photo"
+type="file"
+accept="image/*">
+
+
+<button
+class="mainBtn"
+id="upload">
+
+📷 Profile Photo
+
+</button>
+
+
+<button
+class="mainBtn"
+id="notification">
+
+🔔 Test Notification
+
+</button>
+
+
+</div>
+
+`;
+
+
+$("upload").onclick=
+uploadProfile;
+
+
+$("notification").onclick=
+async()=>{
+
+if(
+!("Notification" in window)
+){
+
+alert(
+"यह browser notification support नहीं करता।"
+);
+
+return;
+
+}
+
+
+const permission=
+await Notification.requestPermission();
+
+
+if(
+permission==="granted"
+){
+
+new Notification(
+"Arslan Ki Duniya",
+{
+body:
+"Notification working ✅"
+}
+);
+
+}
+
+};
+
+}
+
+
+/* =========================
+   PROFILE PHOTO
+========================= */
+
+async function uploadProfile(){
+
+const file=
+$("photo").files[0];
+
+
+if(!file){
+
+alert(
+"पहले photo select करो।"
+);
+
+return;
+
+}
+
+
+try{
+
+const ref=
+storage.ref(
+
+"profiles/"+
+currentUser.uid+
+"/"+
+Date.now()
+
+);
+
+
+await ref.put(file);
+
+
+const url=
+await ref.getDownloadURL();
+
+
+await db.ref(
+"users/"+currentUser.uid
+).update({
+
+photo:url
+
+});
+
+
+alert(
+"Profile photo लग गई ✅"
+);
+
+
+showProfile();
+
+
+}catch(error){
+
+alert(
+error.message
+);
+
+}
+
+}
+
+
+/* =========================
+   CALL SYSTEM
+========================= */
+
+const rtcConfig={
+
+iceServers:[
+
+{
+urls:
+"stun:stun.l.google.com:19302"
+},
+
+{
+urls:
+"stun:stun1.l.google.com:19302"
+}
+
+]
+
+};
+
+
+/* =========================
+   START CALL
+========================= */
+
+async function startCall(
+uid,
+type
+){
+
+if(rtc){
+
+alert(
+"पहले से call चल रही है।"
+);
+
+return;
+
+}
+
+
+try{
+
+const user=
+(
+await db.ref(
+"users/"+uid
+).once("value")
+).val();
+
+
+localStream=
+await navigator.mediaDevices
+.getUserMedia({
+
+audio:true,
+
+video:
+type==="video"
+
+});
+
+
+currentCallId=
+db.ref(
+"calls"
+).push().key;
+
+
+rtc=
+new RTCPeerConnection(
+rtcConfig
+);
+
+
+localStream
+.getTracks()
+.forEach(
+track=>{
+
+rtc.addTrack(
+track,
+localStream
+);
+
+});
+
+
+rtc.onicecandidate=
+event=>{
+
+if(
+event.candidate
+){
+
+db.ref(
+
+"calls/"+
+currentCallId+
+"/callerCandidates"
+
+).push(
+
+event.candidate.toJSON()
+
+);
+
+}
+
+};
+
+
+rtc.ontrack=
+event=>{
+
+const video=
+$("remoteVideo");
+
+if(video){
+
+video.srcObject=
+event.streams[0];
+
+}
+
+};
+
+
+await db.ref(
+"calls/"+currentCallId
+).set({
+
+caller:
+currentUser.uid,
+
+receiver:
+uid,
+
+callerName:
+currentUser.displayName||
+currentUser.email,
+
+type:type,
+
+status:
+"ringing",
+
+time:
+Date.now()
+
+});
+
+
+const offer=
+await rtc.createOffer();
+
+
+await rtc.setLocalDescription(
+offer
+);
+
+
+await db.ref(
+
+"calls/"+
+currentCallId+
+"/offer"
+
+).set({
+
+type:offer.type,
+
+sdp:offer.sdp
+
+});
+
+
+showCall(
+user,
+type,
+"Calling..."
+);
+
+
+db.ref(
+
+"calls/"+
+currentCallId+
+"/answer"
+
+).on(
+"value",
+async snapshot=>{
+
+if(
+
+snapshot.exists()&&
+rtc&&
+!rtc.currentRemoteDescription
+
+){
+
+await rtc.setRemoteDescription(
+
+new RTCSessionDescription(
+snapshot.val()
+)
+
+);
+
+}
+
+}
+);
+
+
+db.ref(
+
+"calls/"+
+currentCallId+
+"/calleeCandidates"
+
+).on(
+
+"child_added",
+
+snapshot=>{
+
+if(rtc){
+
+rtc.addIceCandidate(
+
+new RTCIceCandidate(
+snapshot.val()
+)
+
+).catch(
+()=>{}
+);
+
+}
+
+}
+
+);
+
+
+}catch(error){
+
+alert(
+"Camera/Microphone permission Allow करें।"
+);
+
+endCall(false);
+
+}
+
+}
+
+
+/* =========================
+   INCOMING CALL
+========================= */
+
+function watchIncomingCalls(){
+
+db.ref(
+"calls"
+).on(
+
+"child_added",
+
+async snapshot=>{
+
+if(!currentUser)
+return;
+
+
+const call=
+snapshot.val();
+
+
+if(
+!call||
+call.receiver!==currentUser.uid||
+call.status!=="ringing"
+){
+
+return;
+
+}
+
+
+const user=
+(
+await db.ref(
+"users/"+call.caller
+).once("value")
+).val();
+
+
+showIncoming(
+snapshot.key,
+call,
+user
+);
+
+}
+
+);
+
+}
+
+
+/* =========================
+   INCOMING UI
+========================= */
+
+function showIncoming(
+id,
+call,
+user
+){
+
+if($("incoming"))
+return;
+
+
+document.body.insertAdjacentHTML(
+
+"beforeend",
+
+`
+
+<div
+class="modal"
+id="incoming">
+
+<div
+class="modalBox">
+
+${avatar(user)}
+
+<h2>
+${esc(user.name)}
+</h2>
+
+<p>
+
+${
+call.type==="video"
+?
+"📹 Incoming Video Call"
+:
+"📞 Incoming Voice Call"
+}
+
+</p>
+
+
+<div class="row">
+
+<button
+class="icon endBtn"
+onclick="rejectCall('${id}')">
+
+✕
+
+</button>
+
+
+<button
+class="icon callBtn"
+onclick="acceptCall('${id}')">
+
+✓
+
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+`
+
+);
+
+
+/*
+Local browser notification
+*/
+
+if(
+document.hidden&&
+"Notification" in window&&
+Notification.permission==="granted"
+){
+
+new Notification(
+
+"Arslan Ki Duniya",
+
+{
+
+body:
+user.name+
+" is calling you"
+
+}
+
+);
+
+}
+
+}
+
+
+/* =========================
+   ACCEPT CALL
+========================= */
+
+async function acceptCall(id){
+
+try{
+
+const call=
+(
+await db.ref(
+"calls/"+id
+).once("value")
+).val();
+
+
+if(!call)
+return;
+
+
+$("incoming")?.remove();
+
+
+currentCallId=id;
+
+
+const user=
+(
+await db.ref(
+"users/"+call.caller
+).once("value")
+).val();
+
+
+localStream=
+await navigator.mediaDevices
+.getUserMedia({
+
+audio:true,
+
+video:
+call.type==="video"
+
+});
+
+
+rtc=
+new RTCPeerConnection(
+rtcConfig
+);
+
+
+localStream
+.getTracks()
+.forEach(
+track=>{
+
+rtc.addTrack(
+track,
+localStream
+);
+
+});
+
+
+rtc.onicecandidate=
+event=>{
+
+if(
+event.candidate
+){
+
+db.ref(
+
+"calls/"+
+id+
+"/calleeCandidates"
+
+).push(
+
+event.candidate.toJSON()
+
+);
+
+}
+
+};
+
+
+rtc.ontrack=
+event=>{
+
+const video=
+$("remoteVideo");
+
+if(video){
+
+video.srcObject=
+event.streams[0];
+
+}
+
+};
+
+
+await rtc.setRemoteDescription(
+
+new RTCSessionDescription(
+call.offer
+)
+
+);
+
+
+const answer=
+await rtc.createAnswer();
+
+
+await rtc.setLocalDescription(
+answer
+);
+
+
+await db.ref(
+"calls/"+id
+).update({
+
+answer:{
+
+type:
+answer.type,
+
+sdp:
+answer.sdp
+
+},
+
+status:
+"connected"
+
+});
+
+
+db.ref(
+
+"calls/"+
+id+
+"/callerCandidates"
+
+).on(
+
+"child_added",
+
+snapshot=>{
+
+rtc.addIceCandidate(
+
+new RTCIceCandidate(
+snapshot.val()
+)
+
+).catch(
+()=>{}
+);
+
+}
+
+);
+
+
+showCall(
+user,
+call.type,
+"Connected"
+);
+
+
+}catch(error){
+
+alert(
+error.message
+);
+
+endCall(false);
+
+}
+
+}
+
+
+/* =========================
+   CALL SCREEN
+========================= */
+
+function showCall(
+user,
+type,
+status
+){
+
+$("callScreen")?.remove();
+
+
+document.body.insertAdjacentHTML(
+
+"beforeend",
+
+`
+
+<div
+class="modal"
+id="callScreen">
+
+<div
+class="modalBox">
+
+${avatar(user)}
+
+<h2>
+${esc(user.name)}
+</h2>
+
+<p>
+${status}
+</p>
+
+
+<video
+id="remoteVideo"
+autoplay
+playsinline
+${
+type==="video"
+?""
+:"class='hidden'"
+}>
+</video>
+
+
+<video
+id="localVideo"
+autoplay
+muted
+playsinline
+${
+type==="video"
+?""
+:"class='hidden'"
+}>
+</video>
+
+
+<div class="row">
+
+<button
+class="icon endBtn"
+onclick="endCall()">
+
+☎
+
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+`
+
+);
+
+
+const local=
+$("localVideo");
+
+
+if(
+local&&
+localStream
+){
+
+local.srcObject=
+localStream;
+
+}
+
+}
+
+
+/* =========================
+   REJECT CALL
+========================= */
+
+async function rejectCall(id){
+
+await db.ref(
+"calls/"+id
+).update({
+
+status:
+"rejected"
+
+});
+
+
+$("incoming")?.remove();
+
+}
+
+
+/* =========================
+   END CALL
+========================= */
+
+async function endCall(
+write=true
+){
+
+if(
+write&&
+currentCallId
+){
+
+await db.ref(
+"calls/"+currentCallId
+).update({
+
+status:
+"ended"
+
+});
+
+}
+
+
+if(localStream){
+
+localStream
+.getTracks()
+.forEach(
+track=>track.stop()
+);
+
+}
+
+
+if(rtc){
+
+rtc.close();
+
+rtc=null;
+
+}
+
+
+localStream=null;
+
+currentCallId=null;
+
+$("callScreen")?.remove();
+
+}
+
+
+/* =========================
+   GLOBAL
+========================= */
+
+window.showHome=
+showHome;
+
+window.openChat=
+openChat;
+
+window.startCall=
+startCall;
+
+window.acceptCall=
+acceptCall;
+
+window.rejectCall=
+rejectCall;
+
+window.endCall=
+endCall;
+
+</script>
+
+</body>
+</html>
